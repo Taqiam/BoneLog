@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "BoneLog.Blazor",
   "resources": {
-    "hash": "sha256-tME8BddQhFtvS41lwyP6W7D0Dn2d0uLdm649RyvgRVU=",
+    "hash": "sha256-XeuPKjt7zcwjUSycJEiapVqITiIN6T/pkkmoySjQPg4=",
     "fingerprinting": {
       "Blazorise.m9nkbb8nyy.wasm": "Blazorise.wasm",
       "Blazorise.Icons.FontAwesome.vhmroo7f7a.wasm": "Blazorise.Icons.FontAwesome.wasm",
@@ -59,7 +59,7 @@
       "System.Threading.3twfkmfokt.wasm": "System.Threading.wasm",
       "System.ezrw3d5kw2.wasm": "System.wasm",
       "System.Private.CoreLib.3xabea4ruv.wasm": "System.Private.CoreLib.wasm",
-      "BoneLog.Blazor.1prabh263p.wasm": "BoneLog.Blazor.wasm",
+      "BoneLog.Blazor.9td99ful5j.wasm": "BoneLog.Blazor.wasm",
       "dotnet.js": "dotnet.js",
       "dotnet.native.uhsveqo9bs.js": "dotnet.native.js",
       "dotnet.native.swgexbmoy7.wasm": "dotnet.native.wasm",
@@ -141,7 +141,7 @@
       "System.Text.RegularExpressions.8tzsjr2js9.wasm": "sha256-TMO3RB4/K7p51i38pRci8X1B3RUiTUoN2jLNPUQrNDs=",
       "System.Threading.3twfkmfokt.wasm": "sha256-KRBqxgU9Zh2j0cHE1zIDpLlm7TKMP9QacmuY6myYt84=",
       "System.ezrw3d5kw2.wasm": "sha256-ViNRvhyxlTugIlqJHamw/HwbXlg/YWcrANmxuTM0tfg=",
-      "BoneLog.Blazor.1prabh263p.wasm": "sha256-tRkBa7SMV0ZlHaqSpABdXABw86gA83mF9LIzVXz9dx0="
+      "BoneLog.Blazor.9td99ful5j.wasm": "sha256-0+wSwZOIfoCcRR9gfEXUsGGjqqaW7wWCDt3hVpwGXZQ="
     }
   },
   "cacheBootResources": true,
