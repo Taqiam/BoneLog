@@ -15,12 +15,21 @@ public static partial class FileReaderHelper
         var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
         return Markdown.ToHtml(markdown,pipeline).ApplyAutoDirection();
     }
+    
+    public static string RemoveYamlHeader(this string markdown)
+    {
+        if (string.IsNullOrWhiteSpace(markdown))
+            return markdown;
+
+        var match = front_matter_regex().Match(markdown);
+        return match.Success ? match.Groups[2].Value.TrimStart() : markdown;
+    }
 
     private static string ApplyAutoDirection(this string html)
     {
         string tags = "p|div|span|h1|h2|h3|h4|h5|h6";
-        var regex = new Regex($@"<({tags})(?![^>]*dir=)([^>]*)>(\s*[\u0600-\u06FF])",RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        return regex.Replace(html,@"<$1 dir=""rtl""$2>$3");
+        var regex = new Regex($@"<({tags})(?![^>]*dir=)([^>]*)>(\s*[\u0600-\u06FF])", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        return regex.Replace(html, @"<$1 dir=""rtl""$2>$3");
     }
 
     public static (T?, string) ParseMarkdownToHtmlWithHeader<T>(this string markdown) where T : class
