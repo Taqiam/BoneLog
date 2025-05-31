@@ -5,7 +5,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace BoneLog.Blazor.Utilites;
 
-public static class FileReaderHelper
+public static partial class FileReaderHelper
 {
     [GeneratedRegex(@"^---\s*\n(.*?)\n---\s*\n(.*)$", RegexOptions.Singleline)]
     private static partial Regex front_matter_regex();
