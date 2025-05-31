@@ -1,5 +1,6 @@
 ﻿namespace BoneLog.Tests;
 
+using System.Collections.Generic;
 using BoneLog.Blazor.Dtos;
 using BoneLog.Blazor.Utilites;
 using Xunit;
@@ -24,10 +25,10 @@ public class FileReaderHelperTests
         """;
 
         // Act
-        var (post, html) = FileReaderHelper.ParseMarkdownToHtmlWithHeader<PostMetadata>(markdown);
+        var (post, html) = FileReaderHelper.ParseMarkdownToHtmlWithHeader<PostHeaderDto>(markdown);
 
         // Assert
-        Assert.NotNull(meta);
+        Assert.NotNull(post);
         Assert.Equal("Hello World", post!.Title);
         Assert.Equal("31-05-2025", post.Date);
         Assert.Equal(new List<string> { "test", "example" }, post.Tags);
