@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "title": "This is First Post In BoneLog !",
+    "date": "2025-05-29",
+    "tags": [
+      "BoneLog"
+    ],
+    "thumbnail": "images/Logo.jpg",
+    "shortDescription": "this is my first post in bonelog, jsut for test",
+    "filename": "FirstPost"
+  },
+  {
+    "title": "This is Second Post In BoneLog !",
+    "date": "2025-05-30",
+    "tags": [
+      "BoneLog"
+    ],
+    "thumbnail": "images/Logo.jpg",
+    "shortDescription": "this is my second post in bonelog, jsut for test",
+    "filename": "SecondPost"
+  }
+]
