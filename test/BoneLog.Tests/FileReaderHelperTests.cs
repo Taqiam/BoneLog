@@ -94,4 +94,37 @@ public class FileReaderHelperTests
         // assert
         Assert.Contains(@"dir=""rtl""", html);
     }
+    
+    [Fact]
+    public void ParseMarkdownToHtmlWithHeader_WithoutFrontMatter_ReturnsNullMetadata()
+    {
+        // arrange
+        var markdown = "# No Header";
+
+        // act
+        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostHeaderDto>();
+
+        // assert
+        Assert.Null(meta);
+        Assert.Contains("<h1", html);
+    }
+    
+    [Fact]
+    public void ParseMarkdownToHtmlWithHeader_WithInvalidYaml_ReturnsNullHeader()
+    {
+        // arrange
+        var markdown = """
+                          ---
+                          title Hello World  // missing colon
+                          ---
+                          # Title
+                          """;
+
+        // act
+        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostHeaderDto>();
+
+        // assert
+        Assert.Null(meta);
+        Assert.Contains("Title", html);
+    }
 }

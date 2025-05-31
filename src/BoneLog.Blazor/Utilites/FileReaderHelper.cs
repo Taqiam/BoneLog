@@ -54,7 +54,15 @@ public static partial class FileReaderHelper
           .IgnoreUnmatchedProperties()
           .Build();
 
-        var header = deserializer.Deserialize<T>(yamlContent);
-        return (header, htmlBody);
+        try
+        {
+            var header = deserializer.Deserialize<T>(yamlContent);
+            return (header, htmlBody);
+        }
+        catch (Exception ex)
+        {
+            // in case of deserializer throws any exception we should return null.
+            return (null, htmlBody);
+        }
     }
 }
