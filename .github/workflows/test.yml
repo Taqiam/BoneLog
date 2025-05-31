@@ -11,22 +11,21 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
-    name: Run Tests for Markdown Refactor
+    name: Run Tests
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 9.0.300
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Restore Dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build Solution
-      run: dotnet build --no-restore --configuration Release
+      - name: Build
+        run: dotnet build --no-restore
 
-    - name: Run Tests
-      run: dotnet test --no-build --verbosity normal
+      - name: Test
+        run: dotnet test --verbosity normal --configuration Release
