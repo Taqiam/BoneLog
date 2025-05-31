@@ -1,6 +1,7 @@
 ﻿namespace BoneLog.Tests;
 
 using BoneLog.Blazor.Dtos;
+using Xunit;
 
 public class FileReaderHelperTests
 {
