@@ -8,7 +8,7 @@ namespace BoneLog.Blazor.Utilites;
 public static class FileReaderHelper
 {
     [GeneratedRegex(@"^---\s*\n(.*?)\n---\s*\n(.*)$", RegexOptions.Singleline)]
-    private static Regex front_matter_regex();
+    private static partial Regex front_matter_regex();
 
     public static string MarkdownToHtml(this string markdown)
     {
