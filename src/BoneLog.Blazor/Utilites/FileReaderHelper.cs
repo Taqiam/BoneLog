@@ -35,10 +35,10 @@ public static class FileReaderHelper
             return (null, htmlContent);
         }
 
-        var yaml = match.Groups[1].Value.Trim();
+        var yamlContent = match.Groups[1].Value.Trim();
         var markdownBody = match.Groups[2].Value.Trim();
 
-        htmlBody = MarkdownToHtml(markdownBody);
+        var htmlBody = MarkdownToHtml(markdownBody);
 
         var deserializer = new DeserializerBuilder()
           .WithNamingConvention(CamelCaseNamingConvention.Instance)
