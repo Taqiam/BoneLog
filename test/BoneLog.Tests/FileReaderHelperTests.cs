@@ -1,8 +1,8 @@
 ﻿namespace BoneLog.Tests;
 
 using System.Collections.Generic;
-using BoneLog.Blazor.Dtos;
-using BoneLog.Blazor.Utilites;
+using Blazor.Dtos;
+using Blazor.Utilites;
 using Xunit;
 
 public class FileReaderHelperTests
@@ -11,7 +11,7 @@ public class FileReaderHelperTests
     [Fact]
     public void ParseMarkdownToHtmlWithHeader_ReturnsMetadataAndHtml()
     {
-        // Arrange
+        // arrange
         string markdown = """
         ---
         title: Hello World
@@ -24,15 +24,15 @@ public class FileReaderHelperTests
         This is a test post.
         """;
 
-        // Act
-        var (post, html) = FileReaderHelper.ParseMarkdownToHtmlWithHeader<PostHeaderDto>(markdown);
+        // act
+        var (post, html) = markdown.ParseMarkdownToHtmlWithHeader<PostHeaderDto>();
 
-        // Assert
+        // assert
         Assert.NotNull(post);
         Assert.Equal("Hello World", post!.Title);
         Assert.Equal("31-05-2025", post.Date);
         Assert.Equal(new List<string> { "test", "example" }, post.Tags);
-        Assert.Contains("<h1>", html);
+        Assert.Contains("<h1 ", html);
         Assert.Contains("Welcome", html);
     }
 
