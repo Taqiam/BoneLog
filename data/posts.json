@@ -5,7 +5,7 @@
     "tags": [
       "BoneLog"
     ],
-    "thumbnail": "/images/Logo.jpg",
+    "thumbnail": "images/Logo.jpg",
     "shortDescription": "this is my first post in bonelog, jsut for test",
     "filename": "FirstPost"
   },
@@ -15,7 +15,7 @@
     "tags": [
       "BoneLog"
     ],
-    "thumbnail": "/images/Logo.jpg",
+    "thumbnail": "images/Logo.jpg",
     "shortDescription": "this is my second post in bonelog, jsut for test",
     "filename": "SecondPost"
   }

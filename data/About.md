@@ -1,7 +1,7 @@
 ---
 name: "BoneLog"
 headline: "Easy to use, Free for all"
-avatar: "/images/Logo.jpg"
+avatar: "images/Logo.jpg"
 ---
 
 Hi, this is BoneLog

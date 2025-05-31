@@ -2,8 +2,8 @@
 title: "This is Second Post In BoneLog !"
 date: "2025-05-30"
 tags: ["BoneLog"]
-cover: "/images/Logo.jpg"
-thumbnail : "/images/Logo.jpg"
+cover: "images/Logo.jpg"
+thumbnail : "images/Logo.jpg"
 shortDescription : "this is my second post in bonelog, jsut for test"
 ---
 

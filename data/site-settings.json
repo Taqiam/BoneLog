@@ -1,0 +1,13 @@
+﻿{
+  "Title": "🦴BoneLOG",
+  "NavItems": [
+    {
+      "Title": "About",
+      "Url": "about"
+    },
+    {
+      "Title": "GitHub",
+      "Url": "https://github.com/taqiam/BoneLog"
+    }
+  ]
+}
