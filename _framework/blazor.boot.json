@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "BoneLog.Blazor",
   "resources": {
-    "hash": "sha256-HEY6BvoOYHRsho17vmNIDu5WDbTYR+UjPi59NrN0Bts=",
+    "hash": "sha256-e0FkRQTPFzOWGFhTe7zq4HGQpWvn/8ruy2IgdtBmnko=",
     "jsModuleNative": {
       "dotnet.native.8.0.16.khcj4p6y0x.js": "sha256-RiGT44TFZmHOY+Oqvb8o8r+BJVWex6+dPxFxrOiWvFY="
     },
@@ -20,7 +20,7 @@
       "Blazorise.Icons.FontAwesome.wasm": "sha256-XYM2xPg3CSy6/AONj9lTswEpFNcWq8Xo7MhEIzqLgvc=",
       "Blazorise.Licensing.wasm": "sha256-5Mr9mILwJ1jWAhoNXuDxak5Sw8yU7kCdOyCy13Rdpz4=",
       "Blazorise.wasm": "sha256-4u92QLNNPFyWi+u7EZDZHNwfvT33jRe2tZv8NReW3tQ=",
-      "BoneLog.Blazor.wasm": "sha256-584P8qxoEKnUlVgt+l4Zt9XaT5om/TU21yMrH+f3/xk=",
+      "BoneLog.Blazor.wasm": "sha256-r3pJ6U26scLMGKppUDZ8EPdG6cxhuFco2K3FBVcryVA=",
       "Markdig.wasm": "sha256-eFBnBx0SZSsywfiHkr/ICGB4vhPgDjDkGX+aGXw6ZsY=",
       "Microsoft.AspNetCore.Components.Forms.wasm": "sha256-S+rHxMX8FacijjscNKKOcvKDDzFDyugUegYnLzTo79Y=",
       "Microsoft.AspNetCore.Components.wasm": "sha256-hDNCSofbf0QKm9F0z6A0x1y0epZnpqjWISEhWGWNlOM=",
