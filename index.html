@@ -14,16 +14,15 @@
     <script src="css/prism.js" defer></script>
 
 </head>
-<body class="font-vazir">
-    
-    <div id="app" >
+<body class="font-vazir" id="body">
+
+    <div id="app">
         <svg class="loading-progress">
             <circle r="40%" cx="50%" cy="50%" />
             <circle r="40%" cx="50%" cy="50%" />
         </svg>
         <div class="loading-progress-text"></div>
     </div>
-
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="." class="reload">Reload</a>
@@ -39,7 +38,16 @@
                 return localStorage.getItem(key);
             }
         };
-    </script>
+        window.themeHelper = {
+            applyDarkClass: function (isDark) {
+                if (isDark) {
+                    document.getElementById("body").classList.add('dark');
+                } else {
+                    document.getElementById("body").classList.remove('dark');
+                }
+            }
+        };
+     </script>
 </body>
 
 </html>
