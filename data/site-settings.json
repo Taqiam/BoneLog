@@ -9,5 +9,11 @@
       "Title": "GitHub",
       "Url": "https://github.com/taqiam/BoneLog"
     }
+  ],
+  "SocialLinks": [
+    {
+      "Url": "https://github.com/taqiam",
+      "IconClass": "fab fa-github"
+    }
   ]
 }
