@@ -36,6 +36,5 @@ Got an idea or feature request? Open a PR and let’s make it happen.
 - Support for external blog post sources
 - Sorting
 - Categorize posts
-- Tags Page
 - Metadata handling
 - And more ... 

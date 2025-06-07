@@ -1,14 +1,16 @@
 ﻿using BoneLog.Blazor.Dtos;
 using BoneLog.Blazor.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Json;
 
 namespace BoneLog.Blazor.Pages;
 
-public partial class Home: ComponentBase
+public partial class Home : ComponentBase
 {
     [Inject] HttpClient Http { get; set; } = default!;
-    [Inject] SiteSettingsService SiteSettings{ get; set; } = default!;
+    [Inject] NavigationManager Nav { get; set; } = default!;
+    [Inject] SiteSettingsService SiteSettings { get; set; } = default!;
 
     private List<PostIndexDto>? posts;
     private List<PostIndexDto>? filteredPosts;
@@ -34,6 +36,16 @@ public partial class Home: ComponentBase
         }
     }
 
+    protected override void OnParametersSet()
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        if(QueryHelpers.ParseQuery(uri.Query).TryGetValue("search",out var searchValue))
+        {
+            searchQuery = searchValue.ToString();
+            FilterPosts();
+        }
+    }
+
     private void FilterPosts()
     {
         if(string.IsNullOrWhiteSpace(searchQuery))
@@ -43,10 +55,15 @@ public partial class Home: ComponentBase
         else
         {
             var query = searchQuery.Trim().ToLower();
+            if(query.StartsWith("#"))
+            {
+                query = query.Substring(1);
+                filteredPosts = posts?.Where(p => p.Tags?.Any(tag => tag.Contains(query,StringComparison.OrdinalIgnoreCase)) ?? false).ToList();
+            }
             filteredPosts = posts?.Where(p =>
                     (p.Title.ToLower().Contains(query)) ||
                     (p.ShortDescription?.ToLower().Contains(query) ?? false) ||
-                    (p.Tags?.Any(tag => tag.ToLower().Contains(query)) ?? false) ||
+                    (p.Tags?.Any(tag => tag.Contains(query,StringComparison.OrdinalIgnoreCase)) ?? false) ||
                     (p.Date.ToString().Contains(query))).ToList();
         }
 
