@@ -1,13 +1,14 @@
 {
   "Title": "🦴BoneLOG",
-  "PostsPath": "",
-  "IndexPath": "",
+  "PostsPath": "https://localhost:7215/data/posts/",
+  "IndexPath": "https://localhost:7215/data/posts.json",
+  "CategoriesPath": "./data/categories.json",
   "AboutMe": {
     "Name": "BoneLog",
     "Headline": "Easy to use, Free for all",
     "Avatar": "images/Logo.jpg",
     "ContentUrl": "./data/AboutMe.md"
-  }
+  },
   "NavItems": [
     {
       "Title": "About",

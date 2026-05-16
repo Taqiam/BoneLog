@@ -5,34 +5,27 @@
 
 <PageTitle>About Me</PageTitle>
 
-<div class="max-w-3xl mx-auto px-4 py-8 text-center">
+<div class="page-container page-container--centered">
 
-    @if (isLoading)
-    {
-        <Loading />
-    }
-    else
-    {
-        <div class="mb-6">
+    <div class="about-profile">
             @if (!string.IsNullOrWhiteSpace(Config.AboutMe.Avatar))
             {
-                <div class="mx-auto w-32 h-32 rounded-full overflow-hidden border border-neutral-300 dark:border-white/20">
-                    <img src="@Config.AboutMe.Avatar" alt="Avatar" class="w-full h-full object-cover" />
+                <div class="about-avatar-wrap">
+                    <img src="@Config.AboutMe.Avatar" alt="Avatar" class="about-avatar" />
                 </div>
             }
 
-            <h1 class="mt-4 text-2xl font-bold text-inherit">@Config.AboutMe.Name</h1>
-            <div class="border-t border-neutral-300 dark:border-white/20 my-4 w-1/2 mx-auto"></div>
-            <p class="text-sm text-gray-600 dark:text-gray-300">@Config.AboutMe.Headline</p>
+            <h1 class="about-name">@Config.AboutMe.Name</h1>
+            <div class="about-divider"></div>
+            <p class="about-headline">@Config.AboutMe.Headline</p>
         </div>
 
         @if (string.IsNullOrEmpty(htmlContent))
         {
-            <div class="prose dark:prose-invert max-w-none font-serif text-inherit text-left">
+            <div class="markdown-content markdown-content--left">
                 @((MarkupString)htmlContent)
             </div>
         }
-    }
 </div>
 
 @code {

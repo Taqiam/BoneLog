@@ -1,7 +1,7 @@
 ﻿@page "/{**slug}"
 @inject HttpClient httpClient
 
-<div class="max-w-3xl mx-auto px-4 py-8">
+<div class="page-container">
 
     @if (isLoading)
     {
@@ -13,7 +13,7 @@
     }
     else
     {
-        <div class="prose dark:prose-invert max-w-none font-serif text-inherit">
+        <div class="markdown-content">
             @((MarkupString)htmlContent)
         </div>
     }

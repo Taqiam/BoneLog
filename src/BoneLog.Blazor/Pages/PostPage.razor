@@ -2,7 +2,7 @@
 
 <PageTitle>@((string)(this.post != null ? this.post.Title : "Post"))</PageTitle>
 
-<div class="max-w-3xl mx-auto px-4 py-8">
+<div class="page-container">
 
     @if (isLoading)
     {
@@ -14,30 +14,30 @@
     }
     else
     {
-        <h1 class="text-4xl font-bold font-serif mb-4 text-center text-inherit">@post.Title</h1>
+        <h1 class="post-header">@post.Title</h1>
 
-        <div class="text-sm mb-6 flex flex-wrap justify-between items-center gap-2  text-gray-700 dark:text-gray-300">
+        <div class="post-meta">
             @if (post.Tags?.Length > 0)
             {
-                <div class="flex flex-wrap gap-2">
+                <div class="post-meta__tags">
                     @foreach (var tag in post.Tags)
                     {
                         <Tag TagName="@tag" />
                     }
                 </div>
             }
-            <span class="opacity-70 whitespace-nowrap">@post.CreatedAt</span>
-            <span class="opacity-70 whitespace-nowrap">@post.UpdatedAt</span>
+            <span class="post-meta__date">@post.CreatedAt</span>
+            <span class="post-meta__date">@post.UpdatedAt</span>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(post.Cover))
         {
-            <div class="mb-8">
-                <img src="@post.Cover" alt="Post image" class="w-full max-h-[400px] object-cover rounded-xl border border-neutral-200 dark:border-white/10" />
+            <div class="post-cover">
+                <img src="@post.Cover" alt="Post image" class="post-cover__image" />
             </div>
         }
 
-        <div class="prose dark:prose-invert max-w-none font-serif text-inherit">
+        <div class="markdown-content">
             @((MarkupString)post.Content)
         </div>
 
@@ -57,7 +57,7 @@
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        await Reader.Get(PostName);
+        post = await Reader.Get(PostName);
         isLoading = false;
     }
 

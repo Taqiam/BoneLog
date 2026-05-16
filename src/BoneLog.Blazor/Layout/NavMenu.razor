@@ -11,7 +11,7 @@
     {
         @foreach(var item in Config.NavItems)
         {
-            <a class="hover:text-indigo-700 transition" href="@item.Url">@item.Title</a>
+            <a class="nav-menu__link" href="@item.Url">@item.Title</a>
         }
     }
     @ChildContent

@@ -21,12 +21,7 @@ public partial class Home : ComponentBase
 
     #region Hooks
 
-    protected override async Task OnInitializedAsync()
-    {
-        PostStoreHandler store = new(httpClient, config.IndexPath);
-
-        await ReloadPosts(false);
-    }
+    protected override async Task OnInitializedAsync() => await ReloadPosts(false);
 
     protected override void OnParametersSet()
     {

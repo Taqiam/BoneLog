@@ -9,6 +9,7 @@ public record SiteConfig(
     string Title,
     string PostsPath,
     string IndexPath,
+    string CategoriesPath,
     AboutMeDto AboutMe,
     List<NavItemDto>? NavItems,
     List<SocialLinkDto>? SocialLinks);

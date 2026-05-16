@@ -2,15 +2,14 @@
 @inject HttpClient Http
 @inject SiteConfig Config
 
-<footer class="bg-inherit border-t border-neutral-200 dark:border-white/10 px-6 py-6">
+<footer class="site-footer">
     @if (Config.SocialLinks?.Count > 0)
     {
-        <div class="flex justify-center space-x-4 mb-4">
+        <div class="site-footer__socials">
             @foreach (var link in Config.SocialLinks)
             {
-                Console.WriteLine(link.IconClass);
                 <a href="@link.Url" target="_blank" rel="noopener noreferrer"
-                   class="w-10 h-10 flex items-center justify-center text-2xl rounded-full border border-neutral-300 dark:border-neutral-600 hover:bg-indigo-500 transition">
+                   class="site-footer__social-link">
                     <i class="@link.IconClass"></i>
                 </a>
             }
@@ -18,9 +17,9 @@
     }
 
 
-    <div class="text-center">
-        <code class="text-xs font-mono  border border-indigo-300 dark:border-indigo-500/30 px-3 py-1 rounded text-neutral-700 dark:text-neutral-300">
-           &lt; <a href="https://github.com/taqiam/BoneLog" target="_blank" rel="noopener noreferrer" class="hover:underline">Powered By BoneLog </a><a href="https://github.com/taqiam" target="_blank" rel="noopener noreferrer" class="hover:underline">Made By Tea And 🤍</a> /&gt;
+    <div class="site-footer__credit">
+        <code>
+           &lt; <a href="https://github.com/taqiam/BoneLog" target="_blank" rel="noopener noreferrer">Powered By BoneLog </a><a href="https://github.com/taqiam" target="_blank" rel="noopener noreferrer">Made By Tea And 🤍</a> /&gt;
         </code>
     </div>
 </footer>
