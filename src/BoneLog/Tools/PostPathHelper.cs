@@ -2,10 +2,19 @@ namespace BoneLog.Tools;
 
 public static class PostPathHelper
 {
+    public const string CategorySeparator = " / ";
+
     public static string? CategoryFromPath(string path)
     {
-        var segment = path.Replace('\\', '/').Trim('/').Split('/').FirstOrDefault();
-        return string.IsNullOrWhiteSpace(segment) ? null : FolderNameToTitle(segment);
+        var parts = path.Replace('\\', '/').Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length <= 1)
+            return null;
+
+        var folderSegments = parts[..^1];
+        if (folderSegments.Length == 0)
+            return null;
+
+        return string.Join(CategorySeparator, folderSegments.Select(FolderNameToTitle));
     }
 
     public static string FolderNameToTitle(string folderName)

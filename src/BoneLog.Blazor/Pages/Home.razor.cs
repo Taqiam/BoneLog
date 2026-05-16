@@ -19,13 +19,22 @@ public partial class Home : ComponentBase, IDisposable
     private bool isLoading = true;
     private string searchQuery = string.Empty;
 
-    private string? SelectedCategory =>
-        searchQuery.StartsWith(CatSearchPrefix, StringComparison.OrdinalIgnoreCase)
-            ? searchQuery[CatSearchPrefix.Length..].Trim()
-            : null;
+    private SearchQueryParts parsedSearch = SearchQueryParts.Empty;
+
+    private string? SelectedCategory => parsedSearch.Categories.LastOrDefault();
+
+    private string? SelectedLanguage => parsedSearch.Languages.LastOrDefault();
 
     private PostIndex[] allPosts = [];
     public PostIndex[] Posts = [];
+
+    private bool ShowLanguageSidebar =>
+        config.FeaturesOrDefault.EnableMultilanguage
+        && config.FeaturesOrDefault.LanguageSidebar
+        && allPosts.Select(p => p.Language).Distinct(StringComparer.OrdinalIgnoreCase).Count() > 1;
+
+    private bool ShowSidebar =>
+        config.FeaturesOrDefault.CategorySidebar || ShowLanguageSidebar;
 
 
     #region Hooks
@@ -103,43 +112,157 @@ public partial class Home : ComponentBase, IDisposable
 
     private const string TagSearchPrefix = "Tag:";
     private const string CatSearchPrefix = "Cat:";
+    private const string LangSearchPrefix = "Lang:";
 
     private void ApplySearchQuery()
     {
-        if (string.IsNullOrEmpty(searchQuery))
+        parsedSearch = SearchQueryParts.Parse(searchQuery, config.FeaturesOrDefault.EnableMultilanguage);
+
+        if (parsedSearch.IsEmpty)
         {
             Posts = allPosts;
             CurrentPage = 1;
             return;
         }
 
-        if (searchQuery.StartsWith(TagSearchPrefix, StringComparison.OrdinalIgnoreCase))
+        IEnumerable<PostIndex> results = allPosts;
+
+        foreach (var language in parsedSearch.Languages)
         {
-            var tagQuery = searchQuery[TagSearchPrefix.Length..].Trim();
-            Posts = allPosts
-                .Where(p => p.Tags?.Any(t => t.Contains(tagQuery, StringComparison.OrdinalIgnoreCase)) == true)
-                .OrderByDescending(p => p.Date)
-                .ToArray();
-        }
-        else if (searchQuery.StartsWith(CatSearchPrefix, StringComparison.OrdinalIgnoreCase))
-        {
-            var catQuery = searchQuery[CatSearchPrefix.Length..].Trim();
-            Posts = allPosts
-                .Where(p => p.Category?.Contains(catQuery, StringComparison.OrdinalIgnoreCase) == true)
-                .OrderByDescending(p => p.Date)
-                .ToArray();
-        }
-        else
-        {
-            Posts = allPosts.Where(p =>
-                p.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                p.ShortDescription?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) == true ||
-                (p.Tags?.Any(t => t.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ?? false))
-                .OrderByDescending(p => p.Date)
-                .ToArray();
+            results = results.Where(p =>
+                p.Language.Equals(language, StringComparison.OrdinalIgnoreCase));
         }
 
+        foreach (var category in parsedSearch.Categories)
+        {
+            results = results.Where(p =>
+                p.Category?.Contains(category, StringComparison.OrdinalIgnoreCase) == true);
+        }
+
+        foreach (var tag in parsedSearch.Tags)
+        {
+            results = results.Where(p =>
+                p.Tags?.Any(t => t.Contains(tag, StringComparison.OrdinalIgnoreCase)) == true);
+        }
+
+        foreach (var term in parsedSearch.FreeText)
+        {
+            results = results.Where(p => MatchesFreeText(p, term));
+        }
+
+        Posts = results
+            .OrderByDescending(p => p.Date)
+            .ToArray();
+
         CurrentPage = 1;
+    }
+
+    private static bool MatchesFreeText(PostIndex post, string term) =>
+        post.Title.Contains(term, StringComparison.OrdinalIgnoreCase)
+        || post.ShortDescription?.Contains(term, StringComparison.OrdinalIgnoreCase) == true
+        || (post.Tags?.Any(t => t.Contains(term, StringComparison.OrdinalIgnoreCase)) ?? false);
+
+    private sealed record SearchQueryParts(
+        IReadOnlyList<string> Tags,
+        IReadOnlyList<string> Categories,
+        IReadOnlyList<string> Languages,
+        IReadOnlyList<string> FreeText)
+    {
+        public static readonly SearchQueryParts Empty = new([], [], [], []);
+
+        public bool IsEmpty =>
+            Tags.Count == 0
+            && Categories.Count == 0
+            && Languages.Count == 0
+            && FreeText.Count == 0;
+
+        public static SearchQueryParts Parse(string query, bool enableLanguage)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Empty;
+
+            var tags = new List<string>();
+            var categories = new List<string>();
+            var languages = new List<string>();
+            var freeText = new List<string>();
+
+            var pos = 0;
+            while (pos < query.Length)
+            {
+                if (char.IsWhiteSpace(query[pos]))
+                {
+                    pos++;
+                    continue;
+                }
+
+                if (enableLanguage && TryReadFilter(query, ref pos, LangSearchPrefix, languages))
+                    continue;
+
+                if (TryReadFilter(query, ref pos, CatSearchPrefix, categories))
+                    continue;
+
+                if (TryReadFilter(query, ref pos, TagSearchPrefix, tags))
+                    continue;
+
+                var end = FindNextFilterIndex(query, pos);
+                var chunk = query[pos..end].Trim();
+                if (chunk.Length > 0)
+                {
+                    freeText.AddRange(chunk.Split(
+                        (char[]?)null,
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+                }
+
+                pos = end;
+            }
+
+            return new(tags, categories, languages, freeText);
+        }
+
+        private static bool TryReadFilter(
+            string query,
+            ref int pos,
+            string prefix,
+            List<string> values)
+        {
+            if (!query.AsSpan(pos).StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            pos += prefix.Length;
+            var end = FindNextFilterIndex(query, pos);
+            var value = query[pos..end].Trim();
+            if (value.Length > 0)
+                values.Add(value);
+
+            pos = end;
+            return true;
+        }
+
+        private static int FindNextFilterIndex(string query, int start)
+        {
+            for (var i = start; i < query.Length; i++)
+            {
+                if (!char.IsWhiteSpace(query[i]))
+                    continue;
+
+                var j = i + 1;
+                while (j < query.Length && char.IsWhiteSpace(query[j]))
+                    j++;
+
+                if (j >= query.Length)
+                    return query.Length;
+
+                if (StartsWithFilterPrefix(query, j))
+                    return i;
+            }
+
+            return query.Length;
+        }
+
+        private static bool StartsWithFilterPrefix(string query, int index) =>
+            query.AsSpan(index).StartsWith(TagSearchPrefix, StringComparison.OrdinalIgnoreCase)
+            || query.AsSpan(index).StartsWith(CatSearchPrefix, StringComparison.OrdinalIgnoreCase)
+            || query.AsSpan(index).StartsWith(LangSearchPrefix, StringComparison.OrdinalIgnoreCase);
     }
 
 

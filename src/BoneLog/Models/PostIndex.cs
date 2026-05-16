@@ -9,4 +9,5 @@ public class PostIndex
     public string[]? Tags { get; set; }
     public DateTime? Date { get; set; }
     public string? Thumbnail { get; set; }
+    public string Language { get; set; } = "EN";
 }

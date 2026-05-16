@@ -1,8 +1,17 @@
 @if (!string.IsNullOrEmpty(Name))
 {
+    var segments = Name.Split(PostPathHelper.CategorySeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
     <SearchQueryLink Query="@($"Cat:{Name}")">
         <span class="category">
-            @Name
+            @for (var i = 0; i < segments.Length; i++)
+            {
+                if (i > 0)
+                {
+                    <span class="category__sep" aria-hidden="true">/</span>
+                }
+                <span class="category__segment">@segments[i]</span>
+            }
         </span>
     </SearchQueryLink>
 }

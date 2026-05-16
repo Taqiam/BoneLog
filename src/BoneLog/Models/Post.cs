@@ -13,6 +13,7 @@ public class Post
     public DateTime? Date { get; set; }
     public string? Cover { get; set; }
     public string? Thumbnail { get; set; }
+    public string Language { get; set; } = "EN";
 
     public static Post Create(string path, string htmlContent, PostFrontMatter? frontMatter, string? category = null)
     {
@@ -28,7 +29,8 @@ public class Post
             Date = frontMatter?.Date.ToDateTiem(),
             Cover = frontMatter?.Cover,
             Thumbnail = frontMatter?.Thumbnail,
-            Category = category ?? PostPathHelper.CategoryFromPath(path)
+            Category = category ?? PostPathHelper.CategoryFromPath(path),
+            Language = string.IsNullOrWhiteSpace(frontMatter?.Language) ? "EN" : frontMatter.Language.Trim()
         };
     }
 }

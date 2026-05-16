@@ -1,0 +1,69 @@
+@inject IPostReader PostReader
+@inject NavigationManager Nav
+
+<aside class="language-box" aria-label="Languages">
+    <h2 class="language-box__title">Language</h2>
+
+    @if (isLoading)
+    {
+        <p class="language-box__status">Loading…</p>
+    }
+    else if (languages.Length == 0)
+    {
+        <p class="language-box__status">No languages yet.</p>
+    }
+    else
+    {
+        <nav class="language-box__nav">
+            <ul class="language-list">
+                <li class="language-list__item">
+                    <a href="/"
+                       class="language-list__link @(string.IsNullOrEmpty(SelectedLanguage) ? "language-list__link--active" : null)"
+                       @onclick="NavigateToAllPosts"
+                       @onclick:preventDefault>
+                        All languages
+                    </a>
+                </li>
+                @foreach (var entry in languages)
+                {
+                    var isActive = IsLanguageSelected(entry.Language);
+                    <li class="language-list__item">
+                        <SearchQueryLink Query="@($"Lang:{entry.Language}")"
+                                         Class="@($"language-list__link{(isActive ? " language-list__link--active" : "")}")">
+                            <span class="language-list__label">@entry.Language</span>
+                            <span class="language-list__count">@entry.Count</span>
+                        </SearchQueryLink>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</aside>
+
+@code {
+    [Parameter]
+    public string? SelectedLanguage { get; set; }
+
+    private bool isLoading = true;
+    private LanguageEntry[] languages = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        var posts = await PostReader.GetIndex();
+        languages = posts
+            .GroupBy(p => p.Language, StringComparer.OrdinalIgnoreCase)
+            .Select(g => new LanguageEntry(g.Key, g.Count()))
+            .OrderBy(e => e.Language, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        isLoading = false;
+    }
+
+    private void NavigateToAllPosts() => Nav.NavigateTo("/");
+
+    private bool IsLanguageSelected(string language) =>
+        !string.IsNullOrEmpty(SelectedLanguage)
+        && SelectedLanguage.Equals(language, StringComparison.OrdinalIgnoreCase);
+
+    private sealed record LanguageEntry(string Language, int Count);
+}

@@ -8,4 +8,5 @@ public class PostFrontMatter
     public string? Cover { get; set; }
     public string? Thumbnail { get; set; }
     public string? ShortDescription { get; set; }
+    public string? Language { get; set; }
 }

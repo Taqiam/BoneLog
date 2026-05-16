@@ -24,6 +24,8 @@
     }
   ],
   "Features": {
-    "CategorySidebar": true
+    "CategorySidebar": true,
+    "LanguageSidebar": true,
+    "EnableMultilanguage": true
   }
 }

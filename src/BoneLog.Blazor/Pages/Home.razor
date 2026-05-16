@@ -3,9 +3,18 @@
 <PageTitle>@config.Title</PageTitle>
 
 <div class="home-layout">
-    @if (config.FeaturesOrDefault.CategorySidebar)
+    @if (ShowSidebar)
     {
-        <CategoryBox SelectedCategory="@SelectedCategory" />
+        <div class="home-layout__sidebar">
+            @if (config.FeaturesOrDefault.CategorySidebar)
+            {
+                <CategoryBox SelectedCategory="@SelectedCategory" />
+            }
+            @if (ShowLanguageSidebar)
+            {
+                <LanguageBox SelectedLanguage="@SelectedLanguage" />
+            }
+        </div>
     }
 
     <div class="home-layout__main">
@@ -46,6 +55,7 @@
                                  PublishDate="@postWithIndex.post.Date"
                                  Category="@postWithIndex.post.Category"
                                  Tags="@postWithIndex.post.Tags"
+                                 Language="@postWithIndex.post.Language"
                                  ImageOnRight="@(postWithIndex.i % 2 == 1)" />
                 }
             </div>

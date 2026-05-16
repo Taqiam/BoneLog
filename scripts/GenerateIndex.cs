@@ -57,6 +57,7 @@ sealed class PostIndex
     public string[]? Tags { get; set; }
     public DateTime? Date { get; set; }
     public string? Thumbnail { get; set; }
+    public string Language { get; set; } = "EN";
 }
 
 sealed class PostFrontMatter
@@ -66,6 +67,7 @@ sealed class PostFrontMatter
     public string[]? Tags { get; set; }
     public string? Thumbnail { get; set; }
     public string? ShortDescription { get; set; }
+    public string? Language { get; set; }
 }
 
 #endregion
@@ -140,11 +142,6 @@ static class IndexBuilder
             Console.Error.WriteLine($"No front matter in {relativePath}");
         }
 
-        var parentDir = file.Directory;
-        var categoryFromFolder = parentDir is not null && !IsSamePath(parentDir.FullName, root.FullName)
-            ? FolderNames.ToTitle(parentDir.Name)
-            : null;
-
         post.Title = string.IsNullOrWhiteSpace(header?.Title)
             ? FolderNames.ToTitle(Path.GetFileNameWithoutExtension(file.Name))
             : header.Title;
@@ -152,8 +149,9 @@ static class IndexBuilder
         post.ShortDescription = header?.ShortDescription;
         post.Tags = header?.Tags;
         post.Thumbnail = header?.Thumbnail;
-        post.Category = categoryFromFolder;
+        post.Category = CategoryPathFromPostPath(postPath);
         post.Date = ParseDate(header?.Date);
+        post.Language = string.IsNullOrWhiteSpace(header?.Language) ? "EN" : header.Language.Trim();
 
         return true;
     }
@@ -168,8 +166,17 @@ static class IndexBuilder
             : null;
     }
 
-    static bool IsSamePath(string a, string b) =>
-        string.Equals(Path.GetFullPath(a), Path.GetFullPath(b), StringComparison.OrdinalIgnoreCase);
+    static string? CategoryPathFromPostPath(string postPath)
+    {
+        var parts = postPath.Replace('\\', '/').Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length <= 1)
+            return null;
+
+        var folderSegments = parts[..^1];
+        return folderSegments.Length == 0
+            ? null
+            : string.Join(" / ", folderSegments.Select(FolderNames.ToTitle));
+    }
 }
 
 #endregion

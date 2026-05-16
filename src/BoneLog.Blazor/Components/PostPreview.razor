@@ -21,19 +21,33 @@
             </a>
         </div>
         <div class="post-preview__meta">
-            <div class="post-preview__labels">
-                @if (!string.IsNullOrWhiteSpace(Category))
-                {
-                    <Category Name="@Category" />
-                }
-                @if (Tags?.Length > 0)
-                {
-                    @foreach (var tag in Tags)
+            @if (!string.IsNullOrWhiteSpace(Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(Language)) || Tags?.Length > 0)
+            {
+                <div class="post-meta-groups">
+                    @if (!string.IsNullOrWhiteSpace(Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(Language)))
                     {
-                        <Tag TagName="@tag" />
+                        <div class="post-meta-primary">
+                            @if (!string.IsNullOrWhiteSpace(Category))
+                            {
+                                <Category Name="@Category" />
+                            }
+                            @if (Config.FeaturesOrDefault.EnableMultilanguage)
+                            {
+                                <Language Code="@Language" />
+                            }
+                        </div>
                     }
-                }
-            </div>
+                    @if (Tags?.Length > 0)
+                    {
+                        <div class="post-meta-tags">
+                            @foreach (var tag in Tags)
+                            {
+                                <Tag TagName="@tag" />
+                            }
+                        </div>
+                    }
+                </div>
+            }
             @if (PublishDate is not null)
             {
                 <span class="post-preview__date">
@@ -51,6 +65,7 @@
     [Parameter] public string? ThumbnailUrl { get; set; }
     [Parameter] public string? Category { get; set; }
     [Parameter] public string[]? Tags { get; set; }
+    [Parameter] public string? Language { get; set; }
     [Parameter] public DateTime? PublishDate { get; set; }
     [Parameter] public bool ImageOnRight { get; set; } = true;
 
