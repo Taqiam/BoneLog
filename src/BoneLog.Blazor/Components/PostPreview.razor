@@ -1,4 +1,6 @@
-﻿<div class="post-preview @(ImageOnRight ? "post-preview--image-right" : "")">
+@inject SiteConfig Config
+
+<div class="post-preview @(ImageOnRight ? "post-preview--image-right" : "")">
     @if (ShowImage && !string.IsNullOrWhiteSpace(ThumbnailUrl))
     {
         <div class="post-preview__media">
@@ -9,7 +11,7 @@
 
     <div class="post-preview__body">
         <div>
-            <a href="post/@Path" class="post-preview__title-link">
+            <a href="@($"/post/{Path}")" class="post-preview__title-link">
                 <h2 class="post-preview__title">
                     @Title
                 </h2>
@@ -19,7 +21,11 @@
             </a>
         </div>
         <div class="post-preview__meta">
-            <div class="post-preview__tags">
+            <div class="post-preview__labels">
+                @if (!string.IsNullOrWhiteSpace(Category))
+                {
+                    <Category Name="@Category" />
+                }
                 @if (Tags?.Length > 0)
                 {
                     @foreach (var tag in Tags)
@@ -43,6 +49,7 @@
     [Parameter] public string Description { get; set; } = string.Empty;
     [Parameter] public string Path { get; set; } = "#";
     [Parameter] public string? ThumbnailUrl { get; set; }
+    [Parameter] public string? Category { get; set; }
     [Parameter] public string[]? Tags { get; set; }
     [Parameter] public DateTime? PublishDate { get; set; }
     [Parameter] public bool ImageOnRight { get; set; } = true;

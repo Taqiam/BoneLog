@@ -1,78 +1,82 @@
-﻿@page "/"
+@page "/"
 
 <PageTitle>@config.Title</PageTitle>
 
-<div class="search-bar">
+<div class="home-layout">
+    <CategoryBox SelectedCategory="@SelectedCategory" />
 
-    <button type="button" @onclick="ClearSearch"
-            title="Clear search input"
-            class="search-bar__button search-bar__button--start">
-        ❌
-    </button>
+    <div class="home-layout__main">
+        <div class="search-bar">
 
-    <input type="text"
-           value="@searchQuery"
-           @oninput="OnSearchInput"
-           placeholder="Search posts..."
-           class="search-bar__input" />
+            <button type="button" @onclick="ClearSearch"
+                    title="Clear search input"
+                    class="search-bar__button search-bar__button--start">
+                ❌
+            </button>
 
-    <button type="button" @onclick="() => ReloadPosts(true)"
-            title="Reload posts list from server (bypass cache)"
-            class="search-bar__button search-bar__button--end">
-        🔄
-    </button>
-</div>
+            <input type="text"
+                   value="@searchQuery"
+                   @oninput="OnSearchInput"
+                   placeholder="Search posts..."
+                   class="search-bar__input" />
 
-
-@if (isLoading)
-{
-    <Loading />
-}
-else
-{
-    <div class="post-list">
-        @foreach (var postWithIndex in GetCurrentPage().Select((post, i) => (post, i)))
-        {
-            <PostPreview Title="@postWithIndex.post.Title"
-                         Description="@postWithIndex.post.ShortDescription"
-                         Path="@($"post/{postWithIndex.post.Path}")"
-                         ThumbnailUrl="@postWithIndex.post.Thumbnail"
-                         PublishDate="@postWithIndex.post.Date"
-                         Tags="@postWithIndex.post.Tags"
-                         ImageOnRight="@(postWithIndex.i % 2 == 1)" />
-        }
-    </div>
-    @if (Posts.Length > ITEMS_PER_PAGE)
-    {
-        <div class="pagination">
-            <div class="pagination__bar">
-
-                <button type="button" class="pagination__button"
-                        disabled="@(CurrentPage == 1)"
-                        @onclick="() => CurrentPage--">
-                    ‹ Prev
-                </button>
-
-                <div class="pagination__center">
-                    <div>Page</div>
-                    <input id="pageInput"
-                           type="number"
-                           min="1"
-                           max="@PageCount"
-                           value="@CurrentPage"
-                           @oninput="OnPageInputChanged"
-                           class="pagination__input no-spin" />
-                    <div>of @PageCount</div>
-                </div>
-
-                <button type="button" class="pagination__button"
-                        disabled="@(CurrentPage == PageCount)"
-                        @onclick="() => CurrentPage++">
-                    Next ›
-                </button>
-            </div>
+            <button type="button" @onclick="() => ReloadPosts(true)"
+                    title="Reload posts list from server (bypass cache)"
+                    class="search-bar__button search-bar__button--end">
+                🔄
+            </button>
         </div>
 
+        @if (isLoading)
+        {
+            <Loading />
+        }
+        else
+        {
+            <div class="post-list">
+                @foreach (var postWithIndex in GetCurrentPage().Select((post, i) => (post, i)))
+                {
+                    <PostPreview Title="@postWithIndex.post.Title"
+                                 Description="@postWithIndex.post.ShortDescription"
+                                 Path="@postWithIndex.post.Path"
+                                 ThumbnailUrl="@postWithIndex.post.Thumbnail"
+                                 PublishDate="@postWithIndex.post.Date"
+                                 Category="@postWithIndex.post.Category"
+                                 Tags="@postWithIndex.post.Tags"
+                                 ImageOnRight="@(postWithIndex.i % 2 == 1)" />
+                }
+            </div>
+            @if (Posts.Length > ITEMS_PER_PAGE)
+            {
+                <div class="pagination">
+                    <div class="pagination__bar">
 
-    }
-}
+                        <button type="button" class="pagination__button"
+                                disabled="@(CurrentPage == 1)"
+                                @onclick="() => CurrentPage--">
+                            ‹ Prev
+                        </button>
+
+                        <div class="pagination__center">
+                            <div>Page</div>
+                            <input id="pageInput"
+                                   type="number"
+                                   min="1"
+                                   max="@PageCount"
+                                   value="@CurrentPage"
+                                   @oninput="OnPageInputChanged"
+                                   class="pagination__input no-spin" />
+                            <div>of @PageCount</div>
+                        </div>
+
+                        <button type="button" class="pagination__button"
+                                disabled="@(CurrentPage == PageCount)"
+                                @onclick="() => CurrentPage++">
+                            Next ›
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

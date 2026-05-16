@@ -2,7 +2,7 @@
   "Title": "🦴BoneLOG",
   "PostsPath": "https://localhost:7215/data/posts/",
   "IndexPath": "https://localhost:7215/data/posts.json",
-  "CategoriesPath": "./data/categories.json",
+  "CategoriesPath": "https://localhost:7215/data/categories.json",
   "AboutMe": {
     "Name": "BoneLog",
     "Headline": "Easy to use, Free for all",

@@ -9,7 +9,9 @@ public class PostReader(HttpClient httpClient, PathSettings pathSettings) : IPos
 {
     public async Task<Post?> Get(string relativePath, bool ignoreCache = false)
     {
-        string fullPath = Path.Combine(pathSettings.PostsPath, $"{relativePath}.md");
+        var postsBase = pathSettings.PostsPath.TrimEnd('/');
+        var normalizedPath = relativePath.TrimStart('/').Replace('\\', '/');
+        var fullPath = $"{postsBase}/{normalizedPath}.md";
         var response = await httpClient.GetAsync(fullPath);
 
         if(!response.IsSuccessStatusCode)

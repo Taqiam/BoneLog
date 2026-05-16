@@ -1,0 +1,52 @@
+@inject IPostReader PostReader
+@inject NavigationManager Nav
+
+<aside class="category-box" aria-label="Categories">
+    <h2 class="category-box__title">Categories</h2>
+
+    @if (isLoading)
+    {
+        <p class="category-box__status">Loading…</p>
+    }
+    else if (categories.Length == 0)
+    {
+        <p class="category-box__status">No categories yet.</p>
+    }
+    else
+    {
+        <nav class="category-box__nav">
+            <ul class="category-tree">
+                <li class="category-tree__item">
+                    <a href="/"
+                       class="category-tree__link @(string.IsNullOrEmpty(SelectedCategory) ? "category-tree__link--active" : null)"
+                       @onclick="NavigateToAllPosts"
+                       @onclick:preventDefault>
+                        <span class="category-tree__label">All posts</span>
+                    </a>
+                </li>
+                @foreach (var category in categories)
+                {
+                    <CategoryTreeNode Category="category"
+                                      SelectedCategory="SelectedCategory" />
+                }
+            </ul>
+        </nav>
+    }
+</aside>
+
+@code {
+    [Parameter]
+    public string? SelectedCategory { get; set; }
+
+    private bool isLoading = true;
+    private BoneLog.Models.Category[] categories = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        categories = await PostReader.GetCategories();
+        isLoading = false;
+    }
+
+    private void NavigateToAllPosts() => Nav.NavigateTo("/");
+}

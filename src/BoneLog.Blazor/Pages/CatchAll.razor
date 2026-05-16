@@ -1,4 +1,4 @@
-﻿@page "/{**slug}"
+@page "/{**slug}"
 @inject HttpClient httpClient
 
 <div class="page-container">
@@ -7,7 +7,7 @@
     {
         <Loading />
     }
-    @if (notFound)
+    else if (notFound)
     {
         <NotFound />
     }
@@ -20,7 +20,6 @@
 
 </div>
 
-
 @code {
 
     [Parameter]
@@ -32,13 +31,20 @@
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         var filePath = $"{slug}.md";
 
         var response = await httpClient.GetAsync(filePath);
         if (!response.IsSuccessStatusCode)
+        {
             notFound = true;
+        }
+        else
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            htmlContent = content.RemoveYamlHeader().MarkdownToHtml();
+        }
 
-        var content = await response.Content.ReadAsStringAsync();
-        htmlContent = content.RemoveYamlHeader().MarkdownToHtml();
+        isLoading = false;
     }
 }

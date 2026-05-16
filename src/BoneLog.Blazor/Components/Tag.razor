@@ -1,10 +1,10 @@
-﻿@if(!string.IsNullOrEmpty(TagName))
+﻿@if (!string.IsNullOrEmpty(TagName))
 {
-    <a href="?search=%23@(TagName)">
+    <SearchQueryLink Query="@($"Tag:{TagName}")">
         <span class="tag">
             @TagName
         </span>
-    </a>
+    </SearchQueryLink>
 }
 
 @code {

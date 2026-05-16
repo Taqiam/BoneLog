@@ -1,6 +1,6 @@
-﻿@page "/post/{PostName}"
+@page "/post/{*PostPath}"
 
-<PageTitle>@((string)(this.post != null ? this.post.Title : "Post"))</PageTitle>
+<PageTitle>@((string)(post?.Title ?? "Post"))</PageTitle>
 
 <div class="page-container">
 
@@ -37,10 +37,12 @@
             </div>
         }
 
-        <div class="markdown-content">
-            @((MarkupString)post.Content)
-        </div>
-
+        @if (!string.IsNullOrWhiteSpace(post.Content))
+        {
+            <div class="markdown-content">
+                @((MarkupString)post.Content)
+            </div>
+        }
     }
 </div>
 
@@ -48,16 +50,20 @@
 @code {
     [Inject] IPostReader Reader { get; set; } = default!;
     [Inject] IJSRuntime JS { get; set; } = default!;
-    [Parameter] public string PostName { get; set; } = null!;
 
+    [Parameter]
+    public string PostPath { get; set; } = "";
 
     private bool isLoading = true;
     private Post? post;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        if (string.IsNullOrWhiteSpace(PostPath))
+            return;
+
         isLoading = true;
-        post = await Reader.Get(PostName);
+        post = await Reader.Get(PostPath.Trim('/'));
         isLoading = false;
     }
 

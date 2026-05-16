@@ -10,18 +10,20 @@ using System.Net.Http.Json;
 using System.Text.Json;
 
 
-SiteConfig? config = await new HttpClient().GetFromJsonAsync<SiteConfig>($"https://localhost:7215/config.json", new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-if(config == null)
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+var configUrl = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "config.json");
+SiteConfig? config = await new HttpClient().GetFromJsonAsync<SiteConfig>(configUrl, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+if (config == null)
 {
     Console.WriteLine("Failed to load site configuration.");
     return;
 }
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
-
 builder.Services.AddSingleton(config);
 builder.Services.AddSingleton(new PathSettings(config.PostsPath, config.IndexPath, config.CategoriesPath));
-builder.Services.AddScoped<IPostReader,PostReader>();
+builder.Services.AddScoped<IPostReader, PostReader>();
 
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
