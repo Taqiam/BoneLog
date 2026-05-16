@@ -3,9 +3,9 @@ using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace BoneLog.Blazor.Utilites;
+namespace BoneLog.Tools;
 
-public static partial class FileReaderHelper
+public static partial class MarkdownHelper
 {
     [GeneratedRegex(@"^---\s*\n(.*?)\n---\s*\n(.*)$", RegexOptions.Singleline)]
     private static partial Regex front_matter_regex();
@@ -13,9 +13,9 @@ public static partial class FileReaderHelper
     public static string MarkdownToHtml(this string markdown)
     {
         var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-        return Markdown.ToHtml(markdown,pipeline).ApplyAutoDirection();
+        return Markdown.ToHtml(markdown, pipeline).ApplyAutoDirection();
     }
-    
+
     public static string RemoveYamlHeader(this string markdown)
     {
         if (string.IsNullOrWhiteSpace(markdown))
@@ -34,11 +34,11 @@ public static partial class FileReaderHelper
 
     public static (T?, string) ParseMarkdownToHtmlWithHeader<T>(this string markdown) where T : class
     {
-        if(string.IsNullOrWhiteSpace(markdown))
+        if (string.IsNullOrWhiteSpace(markdown))
             return (null, markdown);
 
         var match = front_matter_regex().Match(markdown);
-        if(!match.Success)
+        if (!match.Success)
         {
             string htmlContent = markdown.MarkdownToHtml();
             return (null, htmlContent);

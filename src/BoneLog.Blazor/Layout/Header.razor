@@ -1,14 +1,14 @@
 ﻿@using BoneLog.Blazor.Components
 @inject HttpClient Http
 @inject NavigationManager Nav
-@inject SiteSettingsService siteSettings;
+@inject SiteConfig Config;
 
 
 <header class="sticky top-0 z-50 bg-inherit border-b border-neutral-200 dark:border-white/10 px-6 py-4">
     <div class="flex justify-between items-center">
         <div class="font-serif text-2xl font-bold">
             <a href="@Nav.BaseUri">
-                @siteSettings.Settings?.Title
+                @Config.Title
             </a>
         </div>
 
@@ -34,10 +34,5 @@
     private bool menuOpen = false;
 
     private void ToggleMenu() => menuOpen = !menuOpen;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await siteSettings.LoadAsync();
-    }
 }
 

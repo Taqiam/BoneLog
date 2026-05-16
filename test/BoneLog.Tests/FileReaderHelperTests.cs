@@ -1,8 +1,8 @@
 ﻿namespace BoneLog.Tests;
 
+using BoneLog.Models;
+using BoneLog.Tools;
 using System.Collections.Generic;
-using Blazor.Dtos;
-using Blazor.Utilites;
 using Xunit;
 
 public class FileReaderHelperTests
@@ -15,7 +15,8 @@ public class FileReaderHelperTests
         string markdown = """
         ---
         title: Hello World
-        date: 31-05-2025
+        createdAt: 31-05-2025
+        updateAt: 16-05-2026
         tags: [test, example]
         cover: cover.jpg
         ---
@@ -25,12 +26,13 @@ public class FileReaderHelperTests
         """;
 
         // act
-        var (post, html) = markdown.ParseMarkdownToHtmlWithHeader<PostHeaderDto>();
+        var (post, html) = markdown.ParseMarkdownToHtmlWithHeader<Post>();
 
         // assert
         Assert.NotNull(post);
         Assert.Equal("Hello World", post!.Title);
-        Assert.Equal("31-05-2025", post.Date);
+        Assert.Equal("31-05-2025", post.CreatedAt.ToString());
+        Assert.Equal("16-05-2026", post.UpdatedAt.ToString());
         Assert.Equal(new List<string> { "test", "example" }, post.Tags);
         Assert.Contains("<h1 ", html);
         Assert.Contains("Welcome", html);
@@ -102,7 +104,7 @@ public class FileReaderHelperTests
         var markdown = "# No Header";
 
         // act
-        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostHeaderDto>();
+        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<Post>();
 
         // assert
         Assert.Null(meta);
@@ -121,7 +123,7 @@ public class FileReaderHelperTests
                           """;
 
         // act
-        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostHeaderDto>();
+        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<Post>();
 
         // assert
         Assert.Null(meta);

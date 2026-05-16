@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\BoneLog.Blazor\BoneLog.Blazor.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Markdig" Version="1.2.0" />
         <PackageReference Include="YamlDotNet" Version="17.1.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
@@ -19,6 +15,10 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\BoneLog\BoneLog.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,14 +1,12 @@
-﻿@using BoneLog.Blazor.Components
-@using BoneLog.Blazor.Dtos
-@using System.Text.Json
+﻿@using BoneLog.Blazor.Dtos
 @inject HttpClient Http
-@inject SiteSettingsService SiteSettings
+@inject SiteConfig Config
 
 <footer class="bg-inherit border-t border-neutral-200 dark:border-white/10 px-6 py-6">
-    @if(SiteSettings.Settings?.SocialLinks != null && SiteSettings.Settings?.SocialLinks.Count > 0)
+    @if (Config.SocialLinks?.Count > 0)
     {
         <div class="flex justify-center space-x-4 mb-4">
-            @foreach(var link in SiteSettings.Settings.SocialLinks)
+            @foreach (var link in Config.SocialLinks)
             {
                 Console.WriteLine(link.IconClass);
                 <a href="@link.Url" target="_blank" rel="noopener noreferrer"
@@ -26,13 +24,3 @@
         </code>
     </div>
 </footer>
-
-
-
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        await SiteSettings.LoadAsync();
-    }
-}

@@ -1,27 +1,27 @@
 ﻿<div class="
-  post-preview
-  flex flex-col md:flex-row @(ImageOnRight ? "md:flex-row-reverse" : "")
-  bg-white dark:bg-stone-950
-  rounded-xl overflow-hidden
-  transition-all duration-300 ease-in-out
-  hover:shadow-lg shadow-indigo-900/50
-  shadow-sm hover:shadow-indigo-900/50
-  hover:-translate-y-1
-">
-    @if(ShowImage && !string.IsNullOrWhiteSpace(ThumbnailUrl))
+    post-preview
+    flex flex-col md:flex-row @(ImageOnRight ? "md:flex-row-reverse" : "")
+    bg-white dark:bg-stone-950
+    rounded-xl overflow-hidden
+    transition-all duration-300 ease-in-out
+    hover:shadow-lg shadow-indigo-900/50
+    shadow-sm hover:shadow-indigo-900/50
+    hover:-translate-y-1
+    ">
+    @if (ShowImage && !string.IsNullOrWhiteSpace(ThumbnailUrl))
     {
         <div class="flex-shrink-0 w-full md:w-48 h-48 md:h-auto">
             <img src="@ThumbnailUrl" alt="Post thumbnail" @onerror="OnImageError"
                  class="
-                     w-full h-full object-cover
-                     md:rounded-none
-                     " />
+            w-full h-full object-cover
+            md:rounded-none
+            " />
         </div>
     }
 
     <div class="flex flex-col justify-between flex-1 text-inherit p-6">
         <div>
-            <a href="@Url" class="block hover:text-accent transition-colors">
+            <a href="post/@Path" class="block hover:text-accent transition-colors">
                 <h2 class="font-serif font-bold text-2xl mb-2 text-inherit">
                     @Title
                 </h2>
@@ -32,17 +32,20 @@
         </div>
         <div class="flex flex-wrap justify-between items-end mt-4 text-sm text-inherit">
             <div class="flex gap-2 flex-wrap">
-                @if(Tags?.Any() == true)
+                @if (Tags?.Length > 0)
                 {
-                    @foreach(var tag in Tags)
+                    @foreach (var tag in Tags)
                     {
-                      <Tag TagName="@tag"/>
+                        <Tag TagName="@tag" />
                     }
                 }
             </div>
-            <span class="opacity-70">
-                @PublishDate.ToString("MMM dd, yyyy")
-            </span>
+            @if (PublishDate is not null)
+            {
+                <span class="opacity-70">
+                    @PublishDate.Value.ToString("MMM dd, yyyy")
+                </span>
+            }
         </div>
     </div>
 </div>
@@ -50,10 +53,10 @@
 @code {
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public string Description { get; set; } = string.Empty;
-    [Parameter] public string Url { get; set; } = "#";
+    [Parameter] public string Path { get; set; } = "#";
     [Parameter] public string? ThumbnailUrl { get; set; }
-    [Parameter] public List<string>? Tags { get; set; }
-    [Parameter] public DateTime PublishDate { get; set; } = DateTime.UtcNow;
+    [Parameter] public string[]? Tags { get; set; }
+    [Parameter] public DateTime? PublishDate { get; set; };
     [Parameter] public bool ImageOnRight { get; set; } = true;
 
     private bool ShowImage = true;

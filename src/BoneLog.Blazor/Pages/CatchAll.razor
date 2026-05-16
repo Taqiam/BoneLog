@@ -1,12 +1,13 @@
 ﻿@page "/{**slug}"
+@inject HttpClient httpClient
 
 <div class="max-w-3xl mx-auto px-4 py-8">
 
-    @if(isLoading)
+    @if (isLoading)
     {
         <Loading />
     }
-    @if(notFound)
+    @if (notFound)
     {
         <NotFound />
     }
@@ -18,3 +19,26 @@
     }
 
 </div>
+
+
+@code {
+
+    [Parameter]
+    public string slug { get; set; } = null!;
+
+    private string htmlContent = string.Empty;
+    private bool isLoading = true;
+    private bool notFound = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var filePath = $"{slug}.md";
+
+        var response = await httpClient.GetAsync(filePath);
+        if (!response.IsSuccessStatusCode)
+            notFound = true;
+
+        var content = await response.Content.ReadAsStringAsync();
+        htmlContent = content.RemoveYamlHeader().MarkdownToHtml();
+    }
+}

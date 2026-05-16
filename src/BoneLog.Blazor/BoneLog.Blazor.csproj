@@ -20,4 +20,8 @@
     <Folder Include="wwwroot\images\thumbnails\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BoneLog\BoneLog.csproj" />
+  </ItemGroup>
+
 </Project>

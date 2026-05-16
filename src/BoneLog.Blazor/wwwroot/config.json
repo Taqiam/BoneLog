@@ -1,0 +1,27 @@
+{
+  "Title": "🦴BoneLOG",
+  "PostsPath": "",
+  "IndexPath": "",
+  "AboutMe": {
+    "Name": "BoneLog",
+    "Headline": "Easy to use, Free for all",
+    "Avatar": "images/Logo.jpg",
+    "ContentUrl": "./data/AboutMe.md"
+  }
+  "NavItems": [
+    {
+      "Title": "About",
+      "Url": "about"
+    },
+    {
+      "Title": "GitHub",
+      "Url": "https://github.com/Taqiam/BoneLog"
+    }
+  ],
+  "SocialLinks": [
+    {
+      "Url": "https://github.com/Taqiam",
+      "IconClass": "fab fa-github"
+    }
+  ]
+}

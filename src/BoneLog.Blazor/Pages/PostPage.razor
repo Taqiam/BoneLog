@@ -1,0 +1,71 @@
+﻿@page "/post/{PostName}"
+
+<PageTitle>@((string)(this.post != null ? this.post.Title : "Post"))</PageTitle>
+
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+    @if (isLoading)
+    {
+        <Loading />
+    }
+    else if (post is null)
+    {
+        <NotFound />
+    }
+    else
+    {
+        <h1 class="text-4xl font-bold font-serif mb-4 text-center text-inherit">@post.Title</h1>
+
+        <div class="text-sm mb-6 flex flex-wrap justify-between items-center gap-2  text-gray-700 dark:text-gray-300">
+            @if (post.Tags?.Length > 0)
+            {
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var tag in post.Tags)
+                    {
+                        <Tag TagName="@tag" />
+                    }
+                </div>
+            }
+            <span class="opacity-70 whitespace-nowrap">@post.CreatedAt</span>
+            <span class="opacity-70 whitespace-nowrap">@post.UpdatedAt</span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(post.Cover))
+        {
+            <div class="mb-8">
+                <img src="@post.Cover" alt="Post image" class="w-full max-h-[400px] object-cover rounded-xl border border-neutral-200 dark:border-white/10" />
+            </div>
+        }
+
+        <div class="prose dark:prose-invert max-w-none font-serif text-inherit">
+            @((MarkupString)post.Content)
+        </div>
+
+    }
+</div>
+
+
+@code {
+    [Inject] IPostReader Reader { get; set; } = default!;
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    [Parameter] public string PostName { get; set; } = null!;
+
+
+    private bool isLoading = true;
+    private Post? post;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        await Reader.Get(PostName);
+        isLoading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (post is not null && !string.IsNullOrEmpty(post.Content))
+        {
+            await JS.InvokeVoidAsync("Prism.highlightAll");
+        }
+    }
+}

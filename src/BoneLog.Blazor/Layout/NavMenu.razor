@@ -1,16 +1,15 @@
 ﻿@using BoneLog.Blazor.Dtos
-@using System.Text.Json
 @inject HttpClient Http
-@inject SiteSettingsService siteSettings
+@inject SiteConfig Config
 
 <nav class="@CssClass">
-    @if(siteSettings.Settings?.NavItems == null)
+    @if(Config?.NavItems == null)
     {
         <p>Loading Items ...</p>
     }
     else
     {
-        @foreach(var item in siteSettings.Settings.NavItems)
+        @foreach(var item in Config.NavItems)
         {
             <a class="hover:text-indigo-700 transition" href="@item.Url">@item.Title</a>
         }
