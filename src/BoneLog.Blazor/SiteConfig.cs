@@ -1,16 +1,18 @@
-﻿namespace BoneLog.Blazor.Dtos;
+﻿using BoneLog.Models;
 
+namespace BoneLog.Blazor.Dtos;
 
-public record NavItemDto(string Title,string Url);
-public record SocialLinkDto(string Url,string IconClass);
-public record class AboutMeDto(string Name, string? Headline, string? Avatar, string? ContentUrl);
+public record NavItemDto(string Title, string Url);
+public record SocialLinkDto(string Url, string IconClass);
+
+public record SiteFeatures(bool CategorySidebar = true);
 
 public record SiteConfig(
     string Title,
-    string PostsPath,
-    string IndexPath,
-    string CategoriesPath,
-    AboutMeDto AboutMe,
+    PathSettings Paths,
     List<NavItemDto>? NavItems,
-    List<SocialLinkDto>? SocialLinks);
-
+    List<SocialLinkDto>? SocialLinks,
+    SiteFeatures? Features = null)
+{
+    public SiteFeatures FeaturesOrDefault => Features ?? new SiteFeatures();
+}

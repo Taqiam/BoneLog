@@ -1,13 +1,13 @@
-@page "/post/{*PostPath}"
+﻿@page "/post/{*PostPath}"
 
 <PageTitle>@((string)(post?.Title ?? "Post"))</PageTitle>
 
 <div class="page-container">
-
     @if (isLoading)
     {
         <Loading />
     }
+
     else if (post is null)
     {
         <NotFound />
@@ -15,28 +15,33 @@
     else
     {
         <h1 class="post-header">@post.Title</h1>
-
         <div class="post-meta">
-            @if (post.Tags?.Length > 0)
-            {
-                <div class="post-meta__tags">
+            <div class="post-meta__labels">
+                @if (!string.IsNullOrWhiteSpace(post.Category))
+                {
+                    <Category Name="@post.Category" />
+                }
+                @if (post.Tags?.Length > 0)
+                {
                     @foreach (var tag in post.Tags)
                     {
                         <Tag TagName="@tag" />
                     }
-                </div>
+                }
+            </div>
+            @if (post.Date is not null)
+            {
+                <span class="post-meta__date">@post.Date.Value.ToString("MMM dd, yyyy")</span>
             }
-            <span class="post-meta__date">@post.CreatedAt</span>
-            <span class="post-meta__date">@post.UpdatedAt</span>
         </div>
-
         @if (!string.IsNullOrWhiteSpace(post.Cover))
         {
             <div class="post-cover">
+
                 <img src="@post.Cover" alt="Post image" class="post-cover__image" />
+
             </div>
         }
-
         @if (!string.IsNullOrWhiteSpace(post.Content))
         {
             <div class="markdown-content">
@@ -48,19 +53,18 @@
 
 
 @code {
+
     [Inject] IPostReader Reader { get; set; } = default!;
     [Inject] IJSRuntime JS { get; set; } = default!;
 
-    [Parameter]
-    public string PostPath { get; set; } = "";
+    [Parameter] public string PostPath { get; set; } = "";
 
     private bool isLoading = true;
     private Post? post;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrWhiteSpace(PostPath))
-            return;
+        if (string.IsNullOrWhiteSpace(PostPath)) return;
 
         isLoading = true;
         post = await Reader.Get(PostPath.Trim('/'));
@@ -74,4 +78,5 @@
             await JS.InvokeVoidAsync("Prism.highlightAll");
         }
     }
+
 }

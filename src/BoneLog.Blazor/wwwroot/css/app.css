@@ -752,10 +752,11 @@ a {
     color: var(--color-text-muted);
 }
 
-.post-meta__tags {
+.post-meta__labels {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    align-items: center;
 }
 
 .post-meta__date {

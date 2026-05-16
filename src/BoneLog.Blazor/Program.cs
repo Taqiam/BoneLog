@@ -21,8 +21,8 @@ if (config == null)
     return;
 }
 
-builder.Services.AddSingleton(config);
-builder.Services.AddSingleton(new PathSettings(config.PostsPath, config.IndexPath, config.CategoriesPath));
+builder.Services.AddSingleton<SiteConfig>(config);
+builder.Services.AddSingleton<PathSettings>(config.Paths);
 builder.Services.AddScoped<IPostReader, PostReader>();
 
 builder.Services.AddSingleton<ThemeService>();

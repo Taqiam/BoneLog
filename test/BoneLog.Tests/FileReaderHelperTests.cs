@@ -1,5 +1,6 @@
 ﻿namespace BoneLog.Tests;
 
+using System;
 using BoneLog.Models;
 using BoneLog.Tools;
 using System.Collections.Generic;
@@ -7,41 +8,67 @@ using Xunit;
 
 public class FileReaderHelperTests
 {
-
     [Fact]
-    public void ParseMarkdownToHtmlWithHeader_ReturnsMetadataAndHtml()
+    public void ParseMarkdownToHtmlWithFrontMatter_ReturnsMetadataAndHtml()
     {
-        // arrange
         string markdown = """
         ---
         title: Hello World
-        createdAt: 31-05-2025
-        updateAt: 16-05-2026
+        date: "2025-05-31"
         tags: [test, example]
         cover: cover.jpg
+        shortDescription: A test post
         ---
         # Welcome
 
         This is a test post.
         """;
 
-        // act
-        var (post, html) = markdown.ParseMarkdownToHtmlWithHeader<Post>();
+        var (frontMatter, html) = markdown.ParseMarkdownToHtmlWithFrontMatter();
 
-        // assert
-        Assert.NotNull(post);
-        Assert.Equal("Hello World", post!.Title);
-        Assert.Equal("31-05-2025", post.CreatedAt.ToString());
-        Assert.Equal("16-05-2026", post.UpdatedAt.ToString());
-        Assert.Equal(new List<string> { "test", "example" }, post.Tags);
+        Assert.NotNull(frontMatter);
+        Assert.Equal("Hello World", frontMatter!.Title);
+        Assert.Equal("2025-05-31", frontMatter.Date);
+        Assert.Equal(new[] { "test", "example" }, frontMatter.Tags);
+        Assert.Equal("cover.jpg", frontMatter.Cover);
+        Assert.Equal("A test post", frontMatter.ShortDescription);
         Assert.Contains("<h1 ", html);
         Assert.Contains("Welcome", html);
     }
-    
+
+    [Fact]
+    public void Post_Create_MergesFrontMatterPathAndCategory()
+    {
+        var frontMatter = new PostFrontMatter
+        {
+            Title = "Hello World",
+            Date = "2025-05-31",
+            Tags = ["test"],
+            ShortDescription = "Summary"
+        };
+
+        var post = Post.Create("tutorials/getting-started", "<p>Hi</p>", frontMatter, "Tutorials");
+
+        Assert.Equal("Hello World", post.Title);
+        Assert.Equal("tutorials/getting-started", post.Path);
+        Assert.Equal("<p>Hi</p>", post.Content);
+        Assert.Equal("Tutorials", post.Category);
+        Assert.Equal("Summary", post.ShortDescription);
+        Assert.Equal(new[] { "test" }, post.Tags);
+        Assert.Equal(new DateTime(2025, 5, 31), post.Date?.Date);
+    }
+
+    [Fact]
+    public void Post_Create_FallsBackToPathForCategory()
+    {
+        var post = Post.Create("dev-journal/my-post", "<p>Hi</p>", null);
+
+        Assert.Equal("Dev Journal", post.Category);
+    }
+
     [Fact]
     public void RemoveYamlHeader_WithValidFrontMatter_RemovesYaml()
     {
-        // arrange
         string markdown = """
                           ---
                           title: Hello
@@ -49,10 +76,8 @@ public class FileReaderHelperTests
                           # Hello World
                           """;
 
-        // act
         var result = markdown.RemoveYamlHeader();
 
-        // assert
         Assert.DoesNotContain("---", result);
         Assert.Contains("# Hello World", result);
     }
@@ -60,26 +85,20 @@ public class FileReaderHelperTests
     [Fact]
     public void RemoveYamlHeader_WithoutFrontMatter_ReturnsOriginal()
     {
-        // arrange
         string markdown = "# Hello World";
 
-        // act
         var result = markdown.RemoveYamlHeader();
 
-        // assert
         Assert.Equal(markdown, result);
     }
 
     [Fact]
     public void MarkdownToHtml_WithSimpleMarkdown_ReturnsExpectedHtml()
     {
-        // arrange
         string markdown = "# Heading";
 
-        // act
         var html = markdown.MarkdownToHtml();
 
-        // assert
         Assert.Contains("<h1", html);
         Assert.Contains("Heading", html);
     }
@@ -87,45 +106,36 @@ public class FileReaderHelperTests
     [Fact]
     public void MarkdownToHtml_WithRTLText_AddsDirRtl()
     {
-        // arrange
         var markdown = "سلام دنیا";
 
-        // act
         var html = markdown.MarkdownToHtml();
 
-        // assert
         Assert.Contains(@"dir=""rtl""", html);
     }
-    
+
     [Fact]
     public void ParseMarkdownToHtmlWithHeader_WithoutFrontMatter_ReturnsNullMetadata()
     {
-        // arrange
         var markdown = "# No Header";
 
-        // act
-        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<Post>();
+        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostFrontMatter>();
 
-        // assert
         Assert.Null(meta);
         Assert.Contains("<h1", html);
     }
-    
+
     [Fact]
     public void ParseMarkdownToHtmlWithHeader_WithInvalidYaml_ReturnsNullHeader()
     {
-        // arrange
         var markdown = """
                           ---
-                          title Hello World  // missing colon
+                          title Hello World
                           ---
                           # Title
                           """;
 
-        // act
-        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<Post>();
+        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostFrontMatter>();
 
-        // assert
         Assert.Null(meta);
         Assert.Contains("Title", html);
     }

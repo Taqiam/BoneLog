@@ -1,13 +1,11 @@
 {
   "Title": "🦴BoneLOG",
-  "PostsPath": "https://localhost:7215/data/posts/",
-  "IndexPath": "https://localhost:7215/data/posts.json",
-  "CategoriesPath": "https://localhost:7215/data/categories.json",
-  "AboutMe": {
-    "Name": "BoneLog",
-    "Headline": "Easy to use, Free for all",
-    "Avatar": "images/Logo.jpg",
-    "ContentUrl": "./data/AboutMe.md"
+  "Paths": {
+    "BaseDataPath": "https://localhost:7215/data/",
+    "PostsPath": "posts/",
+    "IndexPath": "posts.json",
+    "CategoriesPath": "categories.json",
+    "AboutMePath": "AboutMe.md"
   },
   "NavItems": [
     {
@@ -24,5 +22,8 @@
       "Url": "https://github.com/Taqiam",
       "IconClass": "fab fa-github"
     }
-  ]
+  ],
+  "Features": {
+    "CategorySidebar": true
+  }
 }

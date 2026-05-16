@@ -1,15 +1,15 @@
+using BoneLog.Abstractions;
 using BoneLog.Blazor.Dtos;
 using BoneLog.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Text.Json;
 
 namespace BoneLog.Blazor.Pages;
 
 public partial class Home : ComponentBase, IDisposable
 {
-    [Inject] HttpClient httpClient { get; set; } = default!;
+    [Inject] IPostReader Reader { get; set; } = default!;
     [Inject] NavigationManager Nav { get; set; } = default!;
     [Inject] SiteConfig config { get; set; } = default!;
 
@@ -85,24 +85,16 @@ public partial class Home : ComponentBase, IDisposable
 
     public async Task LoadAsync(bool ignoreCache = false)
     {
-        var path = config.IndexPath + (ignoreCache ? $"?nocache={Guid.NewGuid()}" : "");
-
         isLoading = true;
-        var response = await httpClient.GetAsync(path);
-        isLoading = false;
-        if (!response.IsSuccessStatusCode) return;
-
-        var json = await response.Content.ReadAsStringAsync();
-        allPosts = JsonSerializer.Deserialize<PostIndex[]>(json, options: new() { PropertyNameCaseInsensitive = true }) ?? [];
+        allPosts = await Reader.GetIndex(ignoreCache);
         Posts = allPosts;
+        isLoading = false;
     }
+
     private async Task ReloadPosts(bool ignoreCache)
     {
-        isLoading = true;
         await LoadAsync(ignoreCache);
-        isLoading = false;
         ApplySearchQuery();
-        // TODO: Handle fetch failure
     }
 
     #endregion

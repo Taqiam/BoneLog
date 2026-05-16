@@ -1,7 +1,6 @@
-﻿using Markdig;
+﻿using BoneLog.Models;
+using Markdig;
 using System.Text.RegularExpressions;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace BoneLog.Tools;
 
@@ -32,7 +31,10 @@ public static partial class MarkdownHelper
         return regex.Replace(html, @"<$1 dir=""rtl""$2>$3");
     }
 
-    public static (T?, string) ParseMarkdownToHtmlWithHeader<T>(this string markdown) where T : class
+    public static (PostFrontMatter?, string) ParseMarkdownToHtmlWithFrontMatter(this string markdown) =>
+        markdown.ParseMarkdownToHtmlWithHeader<PostFrontMatter>();
+
+    public static (T?, string) ParseMarkdownToHtmlWithHeader<T>(this string markdown) where T : class, new()
     {
         if (string.IsNullOrWhiteSpace(markdown))
             return (null, markdown);
@@ -46,22 +48,15 @@ public static partial class MarkdownHelper
 
         var yamlContent = match.Groups[1].Value.Trim();
         var markdownBody = match.Groups[2].Value.Trim();
-
         var htmlBody = MarkdownToHtml(markdownBody);
-
-        var deserializer = new DeserializerBuilder()
-          .WithNamingConvention(CamelCaseNamingConvention.Instance)
-          .IgnoreUnmatchedProperties()
-          .Build();
 
         try
         {
-            var header = deserializer.Deserialize<T>(yamlContent);
+            var header = FrontMatterDeserializer.Deserialize<T>(yamlContent);
             return (header, htmlBody);
         }
-        catch (Exception ex)
+        catch
         {
-            // in case of deserializer throws any exception we should return null.
             return (null, htmlBody);
         }
     }

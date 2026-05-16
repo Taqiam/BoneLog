@@ -1,6 +1,6 @@
 ﻿using BoneLog.Abstractions;
-using BoneLog.Tools;
 using BoneLog.Models;
+using BoneLog.Tools;
 using System.Text.Json;
 
 namespace BoneLog.Services;
@@ -9,33 +9,26 @@ public class PostReader(HttpClient httpClient, PathSettings pathSettings) : IPos
 {
     public async Task<Post?> Get(string relativePath, bool ignoreCache = false)
     {
-        var postsBase = pathSettings.PostsPath.TrimEnd('/');
+        var postsBase = pathSettings.GetPostsPath().TrimEnd('/');
         var normalizedPath = relativePath.TrimStart('/').Replace('\\', '/');
         var fullPath = $"{postsBase}/{normalizedPath}.md";
+
         var response = await httpClient.GetAsync(fullPath);
 
-        if(!response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
             return null;
 
         string markdown = await response.Content.ReadAsStringAsync();
+        var (frontMatter, htmlContent) = markdown.ParseMarkdownToHtmlWithFrontMatter();
+        var category = await ResolveCategoryAsync(normalizedPath, ignoreCache);
 
-        (Post? result, string htmlContent) = markdown.ParseMarkdownToHtmlWithHeader<Post>();
-
-        if (result != null)
-        {
-            result.Content = htmlContent;
-        }
-        else
-        {
-            result = new("Untitled Post", relativePath, htmlContent);
-        }
-
-        return result;
+        return Post.Create(normalizedPath, htmlContent, frontMatter, category);
     }
 
     public async Task<PostIndex[]> GetIndex(bool ignoreCache = false)
     {
-        var response = await httpClient.GetAsync(pathSettings.IndexPath);
+        var path = pathSettings.GetIndexPath() + (ignoreCache ? $"?nocache={Guid.NewGuid()}" : "");
+        var response = await httpClient.GetAsync(path);
 
         if (!response.IsSuccessStatusCode)
             return [];
@@ -48,7 +41,7 @@ public class PostReader(HttpClient httpClient, PathSettings pathSettings) : IPos
 
     public async Task<Category[]> GetCategories(bool ignoreCache = false)
     {
-        var response = await httpClient.GetAsync(pathSettings.CategoriesPath);
+        var response = await httpClient.GetAsync(pathSettings.GetCategoriesPath());
 
         if (!response.IsSuccessStatusCode)
             return [];
@@ -57,5 +50,27 @@ public class PostReader(HttpClient httpClient, PathSettings pathSettings) : IPos
         Category[]? categories = JsonSerializer.Deserialize<Category[]>(json, options: new() { PropertyNameCaseInsensitive = true });
 
         return categories ?? [];
+    }
+
+    public async Task<AboutMe?> GetAboutMe(bool ignoreCache = false)
+    {
+        var response = await httpClient.GetAsync(pathSettings.GetAboutMePath());
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        string markdown = await response.Content.ReadAsStringAsync();
+        var (frontMatter, htmlContent) = markdown.ParseMarkdownToHtmlWithHeader<AboutMeFrontMatter>();
+
+        return AboutMe.Create(frontMatter, htmlContent);
+    }
+
+    private async Task<string?> ResolveCategoryAsync(string path, bool ignoreCache)
+    {
+        var index = await GetIndex(ignoreCache);
+        var entry = index.FirstOrDefault(p =>
+            string.Equals(p.Path, path, StringComparison.OrdinalIgnoreCase));
+
+        return entry?.Category ?? PostPathHelper.CategoryFromPath(path);
     }
 }

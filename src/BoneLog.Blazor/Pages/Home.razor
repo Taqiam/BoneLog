@@ -3,7 +3,10 @@
 <PageTitle>@config.Title</PageTitle>
 
 <div class="home-layout">
-    <CategoryBox SelectedCategory="@SelectedCategory" />
+    @if (config.FeaturesOrDefault.CategorySidebar)
+    {
+        <CategoryBox SelectedCategory="@SelectedCategory" />
+    }
 
     <div class="home-layout__main">
         <div class="search-bar">

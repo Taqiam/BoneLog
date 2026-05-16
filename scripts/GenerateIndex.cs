@@ -66,7 +66,6 @@ sealed class PostFrontMatter
     public string[]? Tags { get; set; }
     public string? Thumbnail { get; set; }
     public string? ShortDescription { get; set; }
-    public string? Category { get; set; }
 }
 
 #endregion
@@ -153,7 +152,7 @@ static class IndexBuilder
         post.ShortDescription = header?.ShortDescription;
         post.Tags = header?.Tags;
         post.Thumbnail = header?.Thumbnail;
-        post.Category = header?.Category ?? categoryFromFolder;
+        post.Category = categoryFromFolder;
         post.Date = ParseDate(header?.Date);
 
         return true;

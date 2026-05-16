@@ -1,51 +1,47 @@
 ﻿@page "/about"
-@inject HttpClient httpClient
+@inject IPostReader PostReader
 @inject IJSRuntime JS
-@inject SiteConfig Config
 
 <PageTitle>About Me</PageTitle>
 
 <div class="page-container page-container--centered">
 
-    <div class="about-profile">
-            @if (!string.IsNullOrWhiteSpace(Config.AboutMe.Avatar))
+    @if (about is not null)
+    {
+        <div class="about-profile">
+            @if (!string.IsNullOrWhiteSpace(about.Avatar))
             {
                 <div class="about-avatar-wrap">
-                    <img src="@Config.AboutMe.Avatar" alt="Avatar" class="about-avatar" />
+                    <img src="@about.Avatar" alt="Avatar" class="about-avatar" />
                 </div>
             }
 
-            <h1 class="about-name">@Config.AboutMe.Name</h1>
+            <h1 class="about-name">@about.Name</h1>
             <div class="about-divider"></div>
-            <p class="about-headline">@Config.AboutMe.Headline</p>
+            @if (!string.IsNullOrWhiteSpace(about.Headline))
+            {
+                <p class="about-headline">@about.Headline</p>
+            }
         </div>
 
-        @if (string.IsNullOrEmpty(htmlContent))
+        @if (!string.IsNullOrWhiteSpace(about.Content))
         {
             <div class="markdown-content markdown-content--left">
-                @((MarkupString)htmlContent)
+                @((MarkupString)about.Content)
             </div>
         }
+    }
 </div>
 
 @code {
-    private string htmlContent = string.Empty;
+    private AboutMe? about;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var response = await httpClient.GetAsync(Config.AboutMe.ContentUrl);
-        if (!response.IsSuccessStatusCode)
-            return;
-
-        string markdown = await response.Content.ReadAsStringAsync();
-        htmlContent = markdown.RemoveYamlHeader().MarkdownToHtml();
-    }
+    protected override async Task OnInitializedAsync() =>
+        about = await PostReader.GetAboutMe();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (htmlContent != null)
-        {
+        if (firstRender && about is not null)
             await JS.InvokeVoidAsync("Prism.highlightAll");
-        }
     }
 }
