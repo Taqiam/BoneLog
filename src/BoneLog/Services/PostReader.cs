@@ -7,7 +7,7 @@ namespace BoneLog.Services;
 
 public class PostReader(HttpClient httpClient, PathSettings pathSettings) : IPostReader
 {
-    public async Task<Post?> Get(string relativePath, bool ignoreCache = false)
+    public async Task<Post?> GetPost(string relativePath, bool ignoreCache = false)
     {
         var postsBase = pathSettings.GetPostsPath().TrimEnd('/');
         var normalizedPath = relativePath.TrimStart('/').Replace('\\', '/');
@@ -72,5 +72,22 @@ public class PostReader(HttpClient httpClient, PathSettings pathSettings) : IPos
             string.Equals(p.Path, path, StringComparison.OrdinalIgnoreCase));
 
         return entry?.Category ?? PostPathHelper.CategoryFromPath(path);
+    }
+
+    public async Task<string?> GetContent(string relativePath, bool ignoreCache = false)
+    {
+
+        var basePath = pathSettings.BaseDataPath.TrimEnd('/');
+        var normalizedPath = relativePath.TrimStart('/').Replace('\\', '/');
+        var fullPath = $"{basePath}/{normalizedPath}.md";
+
+        var response = await httpClient.GetAsync(fullPath);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var content = await response.Content.ReadAsStringAsync();
+        string htmlContent = content.RemoveYamlHeader().MarkdownToHtml();
+        return htmlContent;
     }
 }

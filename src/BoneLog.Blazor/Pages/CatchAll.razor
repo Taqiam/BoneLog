@@ -1,5 +1,5 @@
 @page "/{**slug}"
-@inject HttpClient httpClient
+@inject IPostReader Reader
 
 <div class="page-container">
 
@@ -7,7 +7,7 @@
     {
         <Loading />
     }
-    else if (notFound)
+    else if (htmlContent is null)
     {
         <NotFound />
     }
@@ -22,29 +22,15 @@
 
 @code {
 
-    [Parameter]
-    public string slug { get; set; } = null!;
+    [Parameter] public string slug { get; set; } = null!;
 
-    private string htmlContent = string.Empty;
+    private string? htmlContent = null;
     private bool isLoading = true;
-    private bool notFound = false;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        var filePath = $"{slug}.md";
-
-        var response = await httpClient.GetAsync(filePath);
-        if (!response.IsSuccessStatusCode)
-        {
-            notFound = true;
-        }
-        else
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            htmlContent = content.RemoveYamlHeader().MarkdownToHtml();
-        }
-
+        htmlContent = await Reader.GetContent(slug);
         isLoading = false;
     }
 }

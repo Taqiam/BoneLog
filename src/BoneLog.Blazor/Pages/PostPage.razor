@@ -82,7 +82,7 @@
         if (string.IsNullOrWhiteSpace(PostPath)) return;
 
         isLoading = true;
-        post = await Reader.Get(PostPath.Trim('/'));
+        post = await Reader.GetPost(PostPath.Trim('/'));
         isLoading = false;
     }
 
