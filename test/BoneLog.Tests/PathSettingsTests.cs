@@ -16,7 +16,7 @@ public class PathSettingsTests
     [Theory]
     [InlineData("https://cdn.example.com/posts/")]
     [InlineData("http://localhost:7215/data/posts.json")]
-    public async Task ResolvePath_ReturnsAbsoluteUrlsUnchanged(string absoluteUrl)
+    public void ResolvePath_ReturnsAbsoluteUrlsUnchanged(string absoluteUrl)
     {
         var settings = new PathSettings("https://example.com/data/", absoluteUrl, absoluteUrl, absoluteUrl);
 

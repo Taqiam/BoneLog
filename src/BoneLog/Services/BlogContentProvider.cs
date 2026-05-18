@@ -9,7 +9,7 @@ public class BlogContentProvider(HttpClient httpClient, PathSettings pathSetting
 {
     public async Task<Post?> GetPost(string relativePath, bool ignoreCache = false)
     {
-        var fullPath = pathSettings.GetPostsPath().ToMarkdownFetchPath(relativePath);
+        var fullPath = pathSettings.GetPostsPath().ToMarkdownFetchPath(relativePath).ApplyIgnoreCache(ignoreCache);
         var response = await httpClient.GetAsync(fullPath);
 
         if (!response.IsSuccessStatusCode)
@@ -22,7 +22,7 @@ public class BlogContentProvider(HttpClient httpClient, PathSettings pathSetting
 
     public async Task<PostIndex[]> GetIndex(bool ignoreCache = false)
     {
-        var path = pathSettings.GetIndexPath() + (ignoreCache ? $"?nocache={Guid.NewGuid()}" : "");
+        var path = pathSettings.GetIndexPath().ApplyIgnoreCache(ignoreCache);
         var response = await httpClient.GetAsync(path);
 
         if (!response.IsSuccessStatusCode)
@@ -36,7 +36,7 @@ public class BlogContentProvider(HttpClient httpClient, PathSettings pathSetting
 
     public async Task<AboutMe?> GetAboutMe(bool ignoreCache = false)
     {
-        var response = await httpClient.GetAsync(pathSettings.GetAboutMePath());
+        var response = await httpClient.GetAsync(pathSettings.GetAboutMePath().ApplyIgnoreCache(ignoreCache));
 
         if (!response.IsSuccessStatusCode)
             return null;
@@ -47,7 +47,7 @@ public class BlogContentProvider(HttpClient httpClient, PathSettings pathSetting
 
     public async Task<string?> GetContent(string relativePath, bool ignoreCache = false)
     {
-        var fullPath = pathSettings.BaseDataPath.ToMarkdownFetchPath(relativePath);
+        var fullPath = pathSettings.BaseDataPath.ToMarkdownFetchPath(relativePath).ApplyIgnoreCache(ignoreCache);
         var response = await httpClient.GetAsync(fullPath);
 
         if (!response.IsSuccessStatusCode)

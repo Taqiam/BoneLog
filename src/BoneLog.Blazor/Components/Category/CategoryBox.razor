@@ -1,14 +1,9 @@
-@inject IBlogContentProvider PostReader
 @inject NavigationManager Nav
 
 <aside class="category-box" aria-label="Categories">
     <h2 class="category-box__title">Categories</h2>
 
-    @if (isLoading)
-    {
-        <p class="category-box__status">Loading…</p>
-    }
-    else if (categories.Length == 0)
+    @if (categories.Length == 0)
     {
         <p class="category-box__status">No categories yet.</p>
     }
@@ -38,16 +33,12 @@
     [Parameter]
     public string? SelectedCategory { get; set; }
 
-    private bool isLoading = true;
-    private BoneLog.Models.Category[] categories = [];
+    [Parameter]
+    public IReadOnlyList<PostIndex> Posts { get; set; } = [];
 
-    protected override async Task OnInitializedAsync()
-    {
-        isLoading = true;
-        var posts = await PostReader.GetIndex();
-        categories = PostIndexCategoriesHelper.BuildCategory(posts);
-        isLoading = false;
-    }
+    private Models.Category[] categories = [];
+
+    protected override void OnParametersSet() => categories = Posts.GetCategories();
 
     private void NavigateToAllPosts() => Nav.NavigateTo("/");
 }

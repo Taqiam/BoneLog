@@ -1,13 +1,7 @@
-@inject IBlogContentProvider PostReader
-
 <aside class="tag-box" aria-label="Tags">
     <h2 class="tag-box__title">Tags</h2>
 
-    @if (isLoading)
-    {
-        <p class="tag-box__status">Loading…</p>
-    }
-    else if (tags.Length == 0)
+    @if (tags.Length == 0)
     {
         <p class="tag-box__status">No tags yet.</p>
     }
@@ -33,36 +27,15 @@
     [Parameter]
     public string? SelectedTag { get; set; }
 
-    private bool isLoading = true;
-    private TagEntry[] tags = [];
+    [Parameter]
+    public IReadOnlyList<PostIndex> Posts { get; set; } = [];
 
-    protected override async Task OnInitializedAsync()
-    {
-        isLoading = true;
-        var posts = await PostReader.GetIndex();
-        var tagCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        foreach (var post in posts)
-        {
-            if (post.Tags is not { Length: > 0 })
-                continue;
+    private PostIndexTagEntry[] tags = [];
 
-            foreach (var tag in post.Tags.Distinct(StringComparer.OrdinalIgnoreCase))
-            {
-                tagCounts.TryGetValue(tag, out var count);
-                tagCounts[tag] = count + 1;
-            }
-        }
-
-        tags = tagCounts
-            .Select(kv => new TagEntry(kv.Key, kv.Value))
-            .OrderBy(e => e.Tag, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-        isLoading = false;
-    }
+    protected override void OnParametersSet() =>
+        tags = Posts.GetTags();
 
     private bool IsTagSelected(string tag) =>
         !string.IsNullOrEmpty(SelectedTag)
         && SelectedTag.Equals(tag, StringComparison.OrdinalIgnoreCase);
-
-    private sealed record TagEntry(string Tag, int Count);
 }

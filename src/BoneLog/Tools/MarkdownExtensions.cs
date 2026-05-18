@@ -6,14 +6,12 @@ namespace BoneLog.Tools;
 
 public static partial class MarkdownExtensions
 {
+    private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+
     [GeneratedRegex(@"^---\s*\n(.*?)\n---\s*\n(.*)$", RegexOptions.Singleline)]
     private static partial Regex FrontMatterRegex();
 
-    public static string ToHtml(this string markdown)
-    {
-        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-        return Markdown.ToHtml(markdown, pipeline).ApplyAutoDirection();
-    }
+    public static string ToHtml(this string markdown) => Markdown.ToHtml(markdown, Pipeline).ApplyAutoDirection();
 
     public static string WithoutFrontMatter(this string markdown)
     {

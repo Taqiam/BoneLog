@@ -79,7 +79,12 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrWhiteSpace(PostPath)) return;
+        if (string.IsNullOrWhiteSpace(PostPath))
+        {
+            post = null;
+            isLoading = false;
+            return;
+        }
 
         isLoading = true;
         post = await Reader.GetPost(PostPath.Trim('/'));

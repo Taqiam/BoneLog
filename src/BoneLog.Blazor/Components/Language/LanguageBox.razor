@@ -1,14 +1,9 @@
-@inject IBlogContentProvider PostReader
 @inject NavigationManager Nav
 
 <aside class="language-box" aria-label="Languages">
     <h2 class="language-box__title">Language</h2>
 
-    @if (isLoading)
-    {
-        <p class="language-box__status">Loading…</p>
-    }
-    else if (languages.Length == 0)
+    @if (languages.Length == 0)
     {
         <p class="language-box__status">No languages yet.</p>
     }
@@ -44,26 +39,16 @@
     [Parameter]
     public string? SelectedLanguage { get; set; }
 
-    private bool isLoading = true;
-    private LanguageEntry[] languages = [];
+    [Parameter]
+    public IReadOnlyList<PostIndex> Posts { get; set; } = [];
 
-    protected override async Task OnInitializedAsync()
-    {
-        isLoading = true;
-        var posts = await PostReader.GetIndex();
-        languages = posts
-            .GroupBy(p => p.Language, StringComparer.OrdinalIgnoreCase)
-            .Select(g => new LanguageEntry(g.Key, g.Count()))
-            .OrderBy(e => e.Language, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-        isLoading = false;
-    }
+    private PostIndexLanguageEntry[] languages = [];
+
+    protected override void OnParametersSet() => languages = Posts.GetLanguages();
 
     private void NavigateToAllPosts() => Nav.NavigateTo("/");
 
     private bool IsLanguageSelected(string language) =>
         !string.IsNullOrEmpty(SelectedLanguage)
         && SelectedLanguage.Equals(language, StringComparison.OrdinalIgnoreCase);
-
-    private sealed record LanguageEntry(string Language, int Count);
 }

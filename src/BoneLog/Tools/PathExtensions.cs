@@ -33,4 +33,11 @@ public static class PathExtensions
 
         return string.Join(' ', words.Select(static w => char.ToUpperInvariant(w[0]) + (w.Length > 1 ? w[1..].ToLowerInvariant() : "")));
     }
+
+    public static string ApplyIgnoreCache(this string url, bool ignoreCache)
+    {
+        if (ignoreCache)
+            url += (url.Contains('?') ? "&" : "?") + $"nocache={DateTime.UtcNow.Ticks}";
+        return url;
+    }
 }

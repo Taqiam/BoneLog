@@ -27,7 +27,7 @@ public class PostIndexFilterTests
             Post("A", date: new DateTime(2021, 1, 1)),
         };
 
-        var result = PostIndexFilter.Apply(posts, SearchQueryParser.Empty);
+        var result = posts.ApplySearch(SearchQueryParser.Empty);
 
         Assert.Equal(2, result.Length);
         Assert.Equal("B", result[0].Title);
@@ -43,7 +43,7 @@ public class PostIndexFilterTests
         };
         var parsed = SearchQueryParser.Parse("Tag:dotnet", enableLanguage: true);
 
-        var result = PostIndexFilter.Apply(posts, parsed);
+        var result = posts.ApplySearch(parsed);
 
         Assert.Single(result);
         Assert.Equal("With", result[0].Title);
@@ -59,7 +59,7 @@ public class PostIndexFilterTests
         };
         var parsed = SearchQueryParser.Parse("beta", enableLanguage: true);
 
-        var result = PostIndexFilter.Apply(posts, parsed);
+        var result = posts.ApplySearch(parsed);
 
         Assert.Single(result);
         Assert.Equal("Alpha", result[0].Title);
@@ -75,7 +75,7 @@ public class PostIndexFilterTests
         };
         var parsed = SearchQueryParser.Parse("Lang:EN", enableLanguage: true);
 
-        var result = PostIndexFilter.Apply(posts, parsed);
+        var result = posts.ApplySearch(parsed);
 
         Assert.Equal("New", result[0].Title);
         Assert.Equal("Old", result[1].Title);

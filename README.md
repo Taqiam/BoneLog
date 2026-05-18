@@ -27,7 +27,7 @@ No build tools, no CMS, no configs. Just files.
    - Or remove these lines if you're using a custom domain.
 
 > [!NOTE]
-> posts.json is generated automatically after each push if GitHub Actions is enabled.
+> `index.json` is generated automatically after each push if GitHub Actions is enabled.
 
 ## Customization
 
@@ -37,7 +37,7 @@ All data and content are inside:
 - To add blog posts → Put `.md` files inside `/data/posts`
 - To create custom pages → Create folders/files like:
   `/data/projects/project1.md` → will be accessible at `yourdomain.com/data/projects/project1`
-- To change site settings (title, navbar, social links, etc.) → Edit `site-settings.json`
+- To change site settings (title, navbar, social links, etc.) → Edit `config.json`
 
 ## Contribute
 Dev doors are always open!

@@ -3,17 +3,17 @@ namespace BoneLog.Tests;
 public class PostIndexCategoriesTests
 {
     [Fact]
-    public void BuildFromIndex_EmptyPosts_ReturnsEmpty()
+    public void GetCategories_EmptyPosts_ReturnsEmpty()
     {
-        Assert.Empty(PostIndexCategoriesHelper.BuildCategory([]));
+        Assert.Empty(Array.Empty<PostIndex>().GetCategories());
     }
 
     [Fact]
-    public void BuildFromIndex_SingleCategory_CountsPost()
+    public void GetCategories_SingleCategory_CountsPost()
     {
         var posts = new[] { new PostIndex { Title = "A", Path = "a", Category = "Dev Journal" } };
 
-        var tree = PostIndexCategoriesHelper.BuildCategory(posts);
+        var tree = posts.GetCategories();
 
         Assert.Single(tree);
         Assert.Equal("Dev Journal", tree[0].Title);
@@ -22,7 +22,7 @@ public class PostIndexCategoriesTests
     }
 
     [Fact]
-    public void BuildFromIndex_NestedPath_BuildsTreeWithTotals()
+    public void GetCategories_NestedPath_BuildsTreeWithTotals()
     {
         var posts = new[]
         {
@@ -31,7 +31,7 @@ public class PostIndexCategoriesTests
             new PostIndex { Title = "C", Path = "c", Category = "Dev Journal / Tutorials" },
         };
 
-        var tree = PostIndexCategoriesHelper.BuildCategory(posts);
+        var tree = posts.GetCategories();
 
         Assert.Single(tree);
         var root = tree[0];

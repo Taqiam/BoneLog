@@ -3,20 +3,20 @@
 <PageTitle>@Config.Title</PageTitle>
 
 <div class="home-layout">
-    @if (ShowSidebar)
+    @if (!isLoading && ShowSidebar)
     {
         <div class="home-layout__sidebar">
             @if (ShowCategories)
             {
-                <CategoryBox SelectedCategory="@SelectedCategory" />
+                <CategoryBox SelectedCategory="@SelectedCategory" Posts="allPosts" />
             }
             @if (ShowLanguageSidebar)
             {
-                <LanguageBox SelectedLanguage="@SelectedLanguage" />
+                <LanguageBox SelectedLanguage="@SelectedLanguage" Posts="allPosts" />
             }
             @if (ShowTagSidebar)
             {
-                <TagBox SelectedTag="@SelectedTag" />
+                <TagBox SelectedTag="@SelectedTag" Posts="allPosts" />
             }
         </div>
     }
@@ -63,7 +63,7 @@
                                  ImageOnRight="@(postWithIndex.i % 2 == 1)" />
                 }
             </div>
-            @if (Posts.Length > PagingHelper.DEFAULT_ITEMS_PER_PAGE)
+            @if (Posts.Length > Config.PostsPerPage)
             {
                 <div class="pagination">
                     <div class="pagination__bar">

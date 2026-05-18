@@ -30,10 +30,10 @@ public partial class Home : ComponentBase, IDisposable
     private string? SelectedTag => parsedSearch.Tags.LastOrDefault();
 
 
-    private bool ShowLanguageSidebar => Config.FeaturesOrDefault.EnableMultilanguage && Config.FeaturesOrDefault.LanguageSidebar && allPosts.HaveTags();
-    private bool ShowTagSidebar => Config.FeaturesOrDefault.TagSidebar && allPosts.HaveLanguages();
+    private bool ShowLanguageSidebar => Config.FeaturesOrDefault.EnableMultilanguage && Config.FeaturesOrDefault.LanguageSidebar && allPosts.HaveLanguages();
+    private bool ShowTagSidebar => Config.FeaturesOrDefault.TagSidebar && allPosts.HaveTags();
     private bool ShowCategories => Config.FeaturesOrDefault.CategorySidebar && allPosts.HaveCategories();
-    private bool ShowSidebar => ShowTagSidebar && ShowCategories && ShowLanguageSidebar;
+    private bool ShowSidebar => ShowCategories || ShowLanguageSidebar || ShowTagSidebar;
 
 
     #region Lifecycle Hooks
@@ -50,7 +50,7 @@ public partial class Home : ComponentBase, IDisposable
         ApplySearchQuery();
     }
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) =>  _ = InvokeAsync(() =>
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => _ = InvokeAsync(() =>
         {
             ApplyQueryFromUri(e.Location);
             StateHasChanged();
@@ -112,7 +112,7 @@ public partial class Home : ComponentBase, IDisposable
     private void ApplySearchQuery()
     {
         parsedSearch = SearchQueryParser.Parse(searchQuery, Config.FeaturesOrDefault.EnableMultilanguage);
-        Posts = PostIndexFilter.Apply(allPosts, parsedSearch);
+        Posts = allPosts.ApplySearch(parsedSearch);
         CurrentPage = 1;
     }
 
