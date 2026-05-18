@@ -23,7 +23,7 @@ if (config == null)
 
 builder.Services.AddSingleton<SiteConfig>(config);
 builder.Services.AddSingleton<PathSettings>(config.Paths);
-builder.Services.AddScoped<IPostReader, PostReader>();
+builder.Services.AddScoped<IBlogContentProvider, BlogContentProvider>();
 
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

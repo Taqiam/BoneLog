@@ -1,6 +1,6 @@
 @if (!string.IsNullOrEmpty(Name))
 {
-    var segments = Name.Split(PostPathHelper.CategorySeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    var segments = Name.Split(PathExtensions.CategorySeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
     <SearchQueryLink Query="@($"Cat:{Name}")">
         <span class="category">

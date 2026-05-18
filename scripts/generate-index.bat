@@ -7,8 +7,7 @@ set "REPO_ROOT=%SCRIPT_DIR%.."
 pushd "%REPO_ROOT%"
 dotnet run "%SCRIPT_DIR%GenerateIndex.cs" -- ^
   "%REPO_ROOT%\src\BoneLog.Blazor\wwwroot\data\posts" ^
-  "%REPO_ROOT%\src\BoneLog.Blazor\wwwroot\data\posts.json" ^
-  "%REPO_ROOT%\src\BoneLog.Blazor\wwwroot\data\categories.json"
+  "%REPO_ROOT%\src\BoneLog.Blazor\wwwroot\data\index.json"
 set "EXIT_CODE=%ERRORLEVEL%"
 popd
 

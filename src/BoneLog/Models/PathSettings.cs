@@ -4,12 +4,10 @@ public record PathSettings(
     string BaseDataPath,
     string PostsPath,
     string IndexPath,
-    string CategoriesPath,
     string AboutMePath)
 {
     public string GetPostsPath() => ResolvePath(PostsPath);
     public string GetIndexPath() => ResolvePath(IndexPath);
-    public string GetCategoriesPath() => ResolvePath(CategoriesPath);
     public string GetAboutMePath() => ResolvePath(AboutMePath);
 
     private string ResolvePath(string path)

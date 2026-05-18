@@ -1,11 +1,5 @@
 ﻿namespace BoneLog.Tests;
 
-using System;
-using BoneLog.Models;
-using BoneLog.Tools;
-using System.Collections.Generic;
-using Xunit;
-
 public class FileReaderHelperTests
 {
     [Fact]
@@ -24,7 +18,7 @@ public class FileReaderHelperTests
         This is a test post.
         """;
 
-        var (frontMatter, html) = markdown.ParseMarkdownToHtmlWithFrontMatter();
+        var (frontMatter, html) = markdown.ToHtmlWithPostFrontMatter();
 
         Assert.NotNull(frontMatter);
         Assert.Equal("Hello World", frontMatter!.Title);
@@ -76,7 +70,7 @@ public class FileReaderHelperTests
                           # Hello World
                           """;
 
-        var result = markdown.RemoveYamlHeader();
+        var result = markdown.WithoutFrontMatter();
 
         Assert.DoesNotContain("---", result);
         Assert.Contains("# Hello World", result);
@@ -87,7 +81,7 @@ public class FileReaderHelperTests
     {
         string markdown = "# Hello World";
 
-        var result = markdown.RemoveYamlHeader();
+        var result = markdown.WithoutFrontMatter();
 
         Assert.Equal(markdown, result);
     }
@@ -97,7 +91,7 @@ public class FileReaderHelperTests
     {
         string markdown = "# Heading";
 
-        var html = markdown.MarkdownToHtml();
+        var html = markdown.ToHtml();
 
         Assert.Contains("<h1", html);
         Assert.Contains("Heading", html);
@@ -108,7 +102,7 @@ public class FileReaderHelperTests
     {
         var markdown = "سلام دنیا";
 
-        var html = markdown.MarkdownToHtml();
+        var html = markdown.ToHtml();
 
         Assert.Contains(@"dir=""rtl""", html);
     }
@@ -118,7 +112,7 @@ public class FileReaderHelperTests
     {
         var markdown = "# No Header";
 
-        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostFrontMatter>();
+        var (meta, html) = markdown.ToHtmlWithFrontMatter<PostFrontMatter>();
 
         Assert.Null(meta);
         Assert.Contains("<h1", html);
@@ -134,7 +128,7 @@ public class FileReaderHelperTests
                           # Title
                           """;
 
-        var (meta, html) = markdown.ParseMarkdownToHtmlWithHeader<PostFrontMatter>();
+        var (meta, html) = markdown.ToHtmlWithFrontMatter<PostFrontMatter>();
 
         Assert.Null(meta);
         Assert.Contains("Title", html);

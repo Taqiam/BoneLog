@@ -3,7 +3,7 @@
 @inject SiteConfig Config
 
 <footer class="site-footer">
-    @if (Config.SocialLinks?.Count > 0)
+    @if (Config.SocialLinks?.Length > 0)
     {
         <div class="site-footer__socials">
             @foreach (var link in Config.SocialLinks)
@@ -19,7 +19,7 @@
 
     <div class="site-footer__credit">
         <code>
-           &lt; <a href="https://github.com/taqiam/BoneLog" target="_blank" rel="noopener noreferrer">Powered By BoneLog </a><a href="https://github.com/taqiam" target="_blank" rel="noopener noreferrer">Made By Tea And 🤍</a> /&gt;
+            &lt; <a href="https://github.com/Taqiam/BoneLog" target="_blank" rel="noopener noreferrer">Powered By BoneLog </a><a href="https://github.com/Taqiam" target="_blank" rel="noopener noreferrer">Made By 🍵 And 🤍</a> /&gt;
         </code>
     </div>
 </footer>

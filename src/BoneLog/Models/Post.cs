@@ -17,7 +17,7 @@ public class Post
 
     public static Post Create(string path, string htmlContent, PostFrontMatter? frontMatter, string? category = null)
     {
-        var title = string.IsNullOrWhiteSpace(frontMatter?.Title) ? PostPathHelper.FolderNameToTitle(System.IO.Path.GetFileNameWithoutExtension(path.Replace('\\', '/'))) : frontMatter.Title;
+        var title = string.IsNullOrWhiteSpace(frontMatter?.Title) ? System.IO.Path.GetFileNameWithoutExtension(path.NormalizeRelativePath()).SlugToTitle() : frontMatter.Title;
 
         return new Post
         {
@@ -26,10 +26,10 @@ public class Post
             Title = title,
             ShortDescription = frontMatter?.ShortDescription,
             Tags = frontMatter?.Tags,
-            Date = frontMatter?.Date.ToDateTiem(),
+            Date = frontMatter?.Date.ToDateTime(),
             Cover = frontMatter?.Cover,
             Thumbnail = frontMatter?.Thumbnail,
-            Category = category ?? PostPathHelper.CategoryFromPath(path),
+            Category = category ?? path.CategoryFromPath(),
             Language = string.IsNullOrWhiteSpace(frontMatter?.Language) ? "EN" : frontMatter.Language.Trim()
         };
     }

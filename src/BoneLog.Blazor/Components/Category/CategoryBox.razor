@@ -1,4 +1,4 @@
-@inject IPostReader PostReader
+@inject IBlogContentProvider PostReader
 @inject NavigationManager Nav
 
 <aside class="category-box" aria-label="Categories">
@@ -44,7 +44,8 @@
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        categories = await PostReader.GetCategories();
+        var posts = await PostReader.GetIndex();
+        categories = PostIndexCategoriesHelper.BuildCategory(posts);
         isLoading = false;
     }
 

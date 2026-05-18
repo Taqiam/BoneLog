@@ -11,15 +11,14 @@ using YamlDotNet.Serialization.NamingConventions;
 
 #region Entry
 
-if (args.Length != 3)
+if (args.Length != 2)
 {
-    Console.Error.WriteLine("Usage: dotnet run GenerateIndex.cs -- <rootPath> <index.json> <categories.json>");
+    Console.Error.WriteLine("Usage: dotnet run GenerateIndex.cs -- <rootPath> <index.json>");
     Environment.Exit(1);
 }
 
 var rootPath = Path.GetFullPath(args[0]);
 var indexOut = Path.GetFullPath(args[1]);
-var categoriesOut = Path.GetFullPath(args[2]);
 
 if (!Directory.Exists(rootPath))
 {
@@ -28,24 +27,14 @@ if (!Directory.Exists(rootPath))
 }
 
 var posts = IndexBuilder.Build(rootPath);
-var categories = CategoryBuilder.Build(rootPath);
 
 await JsonWriter.WriteAsync(indexOut, posts);
-await JsonWriter.WriteAsync(categoriesOut, categories);
 
 Console.WriteLine($"Wrote {posts.Count} posts -> {indexOut}");
-Console.WriteLine($"Wrote {categories.Length} top-level categories -> {categoriesOut}");
 
 #endregion
 
 #region Models
-
-sealed class Category
-{
-    public string Title { get; set; } = "";
-    public int NumberOfPosts { get; set; }
-    public Category[]? SubCategories { get; set; }
-}
 
 sealed class PostIndex
 {
@@ -176,50 +165,6 @@ static class IndexBuilder
         return folderSegments.Length == 0
             ? null
             : string.Join(" / ", folderSegments.Select(FolderNames.ToTitle));
-    }
-}
-
-#endregion
-
-#region CategoryBuilder
-
-static class CategoryBuilder
-{
-    public static Category[] Build(string rootPath)
-    {
-        var root = new DirectoryInfo(rootPath);
-        var categories = new List<Category>();
-
-        foreach (var dir in root.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
-        {
-            var node = BuildNode(dir);
-            if (node.NumberOfPosts > 0)
-                categories.Add(node);
-        }
-
-        return categories.ToArray();
-    }
-
-    static Category BuildNode(DirectoryInfo dir)
-    {
-        var directPosts = dir.EnumerateFiles("*.md", SearchOption.TopDirectoryOnly).Count();
-        var subCategories = new List<Category>();
-
-        foreach (var child in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
-        {
-            var sub = BuildNode(child);
-            if (sub.NumberOfPosts > 0)
-                subCategories.Add(sub);
-        }
-
-        var total = directPosts + subCategories.Sum(c => c.NumberOfPosts);
-
-        return new Category
-        {
-            Title = FolderNames.ToTitle(dir.Name),
-            NumberOfPosts = total,
-            SubCategories = subCategories.Count > 0 ? subCategories.ToArray() : null
-        };
     }
 }
 
