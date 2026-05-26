@@ -1,0 +1,32 @@
+name: Deploy to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Generate index.json
+        run: dotnet run scripts/GenerateIndex.cs -- src/BoneLog.Blazor/wwwroot/data/posts src/BoneLog.Blazor/wwwroot/data/index.json
+
+      - name: Publish Blazor app
+        run: dotnet publish src/BoneLog.Blazor/BoneLog.Blazor.csproj -c Release -o release --nologo
+
+      - name: Add .nojekyll
+        run: touch release/wwwroot/.nojekyll
+
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: release/wwwroot
+          clean: true

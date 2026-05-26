@@ -19,15 +19,11 @@ No build tools, no CMS, no configs. Just files.
 4. Enable GitHub Pages:
    - Go to **Settings > Pages**
    - Choose the `gh-pages` branch as source
-5. (Optional) If you renamed the repo or use a custom domain:
-   - Edit the `base href` in `.github/workflows/full-build.yml`:
-     ```yaml
-     sed -i 's|<base href="/" />|<base href="/YourRepoName/" />|g' ...
-     ```
-   - Or remove these lines if you're using a custom domain.
+5. Set `BaseDir` in `src/BoneLog.Blazor/wwwroot/config.json` (e.g. `"/YourRepoName/"` for project pages, or `"/"` for a custom domain).
+6. Run **Deploy to GitHub Pages** from the Actions tab (manual), or push a version tag (`v1.0.0`) to publish a release and deploy.
 
 > [!NOTE]
-> `index.json` is generated automatically after each push if GitHub Actions is enabled.
+> `index.json` is regenerated and committed to `main` when posts under `wwwroot/data/posts` change. Deploying the site is separate (manual deploy or tag release).
 
 ## Customization
 

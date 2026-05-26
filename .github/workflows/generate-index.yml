@@ -1,0 +1,41 @@
+name: Generate Index
+
+on:
+  workflow_call:
+    inputs:
+      posts-dir:
+        description: Directory containing post markdown files
+        required: true
+        type: string
+      index-out:
+        description: Output path for index.json
+        required: true
+        type: string
+      commit-changes:
+        description: Commit index files back to the repository
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Generate index.json
+        run: dotnet run scripts/GenerateIndex.cs -- ${{ inputs.posts-dir }} ${{ inputs.index-out }}
+
+      - name: Commit index files
+        if: inputs.commit-changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: chore: update index.json
+          file_pattern: |
+            src/BoneLog.Blazor/wwwroot/data/index.json
+            src/BoneLog.Blazor/wwwroot/data/index.manifest.json

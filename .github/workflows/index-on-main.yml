@@ -1,0 +1,22 @@
+name: Update index on main
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'src/BoneLog.Blazor/wwwroot/data/posts/**'
+      - 'scripts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  index:
+    uses: ./.github/workflows/generate-index.yml
+    permissions:
+      contents: write
+    with:
+      posts-dir: src/BoneLog.Blazor/wwwroot/data/posts
+      index-out: src/BoneLog.Blazor/wwwroot/data/index.json
+      commit-changes: true
