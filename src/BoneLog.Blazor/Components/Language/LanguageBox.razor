@@ -12,7 +12,7 @@
         <nav class="language-box__nav">
             <ul class="language-list">
                 <li class="language-list__item">
-                    <a href="/"
+                    <a href="@Nav.BaseUri"
                        class="language-list__link @(string.IsNullOrEmpty(SelectedLanguage) ? "language-list__link--active" : null)"
                        @onclick="NavigateToAllPosts"
                        @onclick:preventDefault>
@@ -46,7 +46,7 @@
 
     protected override void OnParametersSet() => languages = Posts.GetLanguages();
 
-    private void NavigateToAllPosts() => Nav.NavigateTo("/");
+    private void NavigateToAllPosts() => Nav.NavigateTo(Nav.BaseUri);
 
     private bool IsLanguageSelected(string language) =>
         !string.IsNullOrEmpty(SelectedLanguage)

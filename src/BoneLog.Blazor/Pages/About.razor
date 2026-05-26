@@ -1,6 +1,5 @@
 ﻿@page "/about"
 @inject IBlogContentProvider PostReader
-@inject IJSRuntime JS
 
 <PageTitle>About Me</PageTitle>
 
@@ -24,12 +23,7 @@
             }
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(about.Content))
-        {
-            <div class="markdown-content markdown-content--left">
-                @((MarkupString)about.Content)
-            </div>
-        }
+        <MarkdownContent Content="@about.Content" AdditionalCssClass="markdown-content--left" />
     }
 </div>
 
@@ -38,10 +32,4 @@
 
     protected override async Task OnInitializedAsync() =>
         about = await PostReader.GetAboutMe();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && about is not null)
-            await JS.InvokeVoidAsync("Prism.highlightAll");
-    }
 }

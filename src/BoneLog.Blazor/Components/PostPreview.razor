@@ -11,7 +11,7 @@
 
     <div class="post-preview__body">
         <div>
-            <a href="@($"/post/{Path}")" class="post-preview__title-link">
+            <a href="@PostHref" class="post-preview__title-link">
                 <h2 class="post-preview__title">
                     @Title
                 </h2>
@@ -70,6 +70,8 @@
     [Parameter] public bool ImageOnRight { get; set; } = true;
 
     private bool ShowImage = true;
+
+    private string PostHref => $"post/{Path.TrimStart('/')}";
 
     private void OnImageError()
     {

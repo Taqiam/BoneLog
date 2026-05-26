@@ -1,5 +1,6 @@
 {
   "Title": "🦴BoneLOG",
+  "BaseDir": "/",
   "PostsPerPage": 10,
   "Paths": {
     "BaseDataPath": "https://localhost:7215/data/",

@@ -98,6 +98,24 @@ public class FileReaderHelperTests
     }
 
     [Fact]
+    public void MarkdownToHtml_WithMermaidBlock_EmitsMermaidDiv()
+    {
+        var markdown = """
+            ```mermaid
+            flowchart LR
+              A --> B
+            ```
+            """;
+
+        var html = markdown.ToHtml();
+
+        Assert.Contains("<div class=\"mermaid\"", html);
+        Assert.Contains("data-source=", html);
+        Assert.Contains("flowchart LR", html);
+        Assert.DoesNotContain("<pre class=\"mermaid\"", html);
+    }
+
+    [Fact]
     public void MarkdownToHtml_WithRTLText_AddsDirRtl()
     {
         var markdown = "سلام دنیا";

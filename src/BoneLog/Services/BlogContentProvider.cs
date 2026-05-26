@@ -17,7 +17,7 @@ public class BlogContentProvider(HttpClient httpClient, PathSettings pathSetting
 
         string markdown = await response.Content.ReadAsStringAsync();
         var normalizedPath = relativePath.NormalizeRelativePath();
-        return markdown.ToPost(normalizedPath);
+        return markdown.ToPost(normalizedPath, pathSettings);
     }
 
     public async Task<PostIndex[]> GetIndex(bool ignoreCache = false)
@@ -42,7 +42,8 @@ public class BlogContentProvider(HttpClient httpClient, PathSettings pathSetting
             return null;
 
         string markdown = await response.Content.ReadAsStringAsync();
-        return markdown.ToAboutMe();
+        var aboutPath = pathSettings.AboutMePath.NormalizeRelativePath();
+        return markdown.ToAboutMe(pathSettings, aboutPath);
     }
 
     public async Task<string?> GetContent(string relativePath, bool ignoreCache = false)
@@ -54,6 +55,7 @@ public class BlogContentProvider(HttpClient httpClient, PathSettings pathSetting
             return null;
 
         var content = await response.Content.ReadAsStringAsync();
-        return content.ToHtmlBody();
+        var normalizedPath = relativePath.NormalizeRelativePath();
+        return content.ToHtmlBody(normalizedPath, pathSettings);
     }
 }

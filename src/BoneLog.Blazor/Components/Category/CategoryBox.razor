@@ -12,7 +12,7 @@
         <nav class="category-box__nav">
             <ul class="category-tree">
                 <li class="category-tree__item">
-                    <a href="/"
+                    <a href="@Nav.BaseUri"
                        class="category-tree__link @(string.IsNullOrEmpty(SelectedCategory) ? "category-tree__link--active" : null)"
                        @onclick="NavigateToAllPosts"
                        @onclick:preventDefault>
@@ -40,5 +40,5 @@
 
     protected override void OnParametersSet() => categories = Posts.GetCategories();
 
-    private void NavigateToAllPosts() => Nav.NavigateTo("/");
+    private void NavigateToAllPosts() => Nav.NavigateTo(Nav.BaseUri);
 }

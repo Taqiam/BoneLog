@@ -57,12 +57,7 @@
 
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(post.Content))
-        {
-            <div class="markdown-content">
-                @((MarkupString)post.Content)
-            </div>
-        }
+        <MarkdownContent Content="@post.Content" />
     }
 </div>
 
@@ -70,7 +65,6 @@
 @code {
 
     [Inject] IBlogContentProvider Reader { get; set; } = default!;
-    [Inject] IJSRuntime JS { get; set; } = default!;
 
     [Parameter] public string PostPath { get; set; } = "";
 
@@ -89,14 +83,6 @@
         isLoading = true;
         post = await Reader.GetPost(PostPath.Trim('/'));
         isLoading = false;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (post is not null && !string.IsNullOrEmpty(post.Content))
-        {
-            await JS.InvokeVoidAsync("Prism.highlightAll");
-        }
     }
 
 }

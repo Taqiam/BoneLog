@@ -1,4 +1,5 @@
 @page "/"
+@inject PathSettings PathSettings
 
 <PageTitle>@Config.Title</PageTitle>
 
@@ -55,7 +56,7 @@
                     <PostPreview Title="@postWithIndex.post.Title"
                                  Description="@postWithIndex.post.ShortDescription"
                                  Path="@postWithIndex.post.Path"
-                                 ThumbnailUrl="@postWithIndex.post.Thumbnail"
+                                 ThumbnailUrl="@postWithIndex.post.ResolveThumbnail(PathSettings)"
                                  PublishDate="@postWithIndex.post.Date"
                                  Category="@postWithIndex.post.Category"
                                  Tags="@postWithIndex.post.Tags"

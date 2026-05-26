@@ -116,7 +116,7 @@ public partial class Home : ComponentBase, IDisposable
         CurrentPage = 1;
     }
 
-    private void ClearSearch() => Nav.NavigateTo("/", replace: true);
+    private void ClearSearch() => Nav.NavigateTo(Nav.BaseUri, replace: true);
 
     #endregion
 

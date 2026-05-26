@@ -17,7 +17,7 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    private string Href => $"/?q={Uri.EscapeDataString(Query)}";
+    private string Href => $"{Nav.BaseUri}?q={Uri.EscapeDataString(Query)}";
 
     private void Navigate() => Nav.NavigateTo(Href);
 }

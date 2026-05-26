@@ -1,5 +1,6 @@
 using BoneLog.Models;
 using Markdig;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace BoneLog.Tools;
@@ -11,7 +12,14 @@ public static partial class MarkdownExtensions
     [GeneratedRegex(@"^---\s*\n(.*?)\n---\s*\n(.*)$", RegexOptions.Singleline)]
     private static partial Regex FrontMatterRegex();
 
-    public static string ToHtml(this string markdown) => Markdown.ToHtml(markdown, Pipeline).ApplyAutoDirection();
+    [GeneratedRegex(@"<pre><code class=""language-mermaid"">(.*?)</code></pre>", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
+    private static partial Regex MermaidCodePreRegex();
+
+    [GeneratedRegex(@"<pre\s+class=""mermaid"">(.*?)</pre>", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
+    private static partial Regex MermaidClassPreRegex();
+
+    public static string ToHtml(this string markdown) =>
+        Markdown.ToHtml(markdown, Pipeline).ApplyMermaid().ApplyAutoDirection();
 
     public static string WithoutFrontMatter(this string markdown)
     {
@@ -49,20 +57,49 @@ public static partial class MarkdownExtensions
         }
     }
 
-    public static Post ToPost(this string markdown, string normalizedPath)
+    public static Post ToPost(this string markdown, string normalizedPath, PathSettings pathSettings)
     {
         var (frontMatter, htmlContent) = markdown.ToHtmlWithPostFrontMatter();
-        return Post.Create(normalizedPath, htmlContent, frontMatter);
+        htmlContent = htmlContent.ResolveHtmlAssetUrls(normalizedPath, pathSettings);
+
+        var post = Post.Create(normalizedPath, htmlContent, frontMatter);
+        post.Cover = ContentPathExtensions.ResolvePostAssetUrl(normalizedPath, post.Cover, pathSettings);
+        post.Thumbnail = ContentPathExtensions.ResolvePostAssetUrl(normalizedPath, post.Thumbnail, pathSettings);
+        return post;
     }
 
-    public static AboutMe ToAboutMe(this string markdown)
+    public static AboutMe ToAboutMe(this string markdown, PathSettings pathSettings, string markdownRelativePath = "AboutMe.md")
     {
         var (frontMatter, htmlContent) = markdown.ToHtmlWithFrontMatter<AboutMeFrontMatter>();
-        return AboutMe.Create(frontMatter, htmlContent);
+        htmlContent = htmlContent.ResolveHtmlAssetUrls(markdownRelativePath, pathSettings, isPost: false);
+
+        var about = AboutMe.Create(frontMatter, htmlContent);
+        about.Avatar = ContentPathExtensions.ResolveDataFileAssetUrl(markdownRelativePath, about.Avatar, pathSettings);
+        return about;
     }
 
-    public static string ToHtmlBody(this string markdown) =>
-        markdown.WithoutFrontMatter().ToHtml();
+    public static string ToHtmlBody(this string markdown, string contentRelativePath, PathSettings pathSettings, bool isPost = false) =>
+        markdown.WithoutFrontMatter().ToHtml().ResolveHtmlAssetUrls(contentRelativePath, pathSettings, isPost);
+
+    private static string ApplyMermaid(this string html)
+    {
+        if (string.IsNullOrEmpty(html))
+            return html;
+
+        return html
+            .ReplaceMermaidBlocks(MermaidCodePreRegex())
+            .ReplaceMermaidBlocks(MermaidClassPreRegex());
+    }
+
+    private static string ReplaceMermaidBlocks(this string html, Regex pattern) =>
+        pattern.Replace(html, match => match.Groups[1].Value.ToMermaidDiv());
+
+    private static string ToMermaidDiv(this string source)
+    {
+        source = WebUtility.HtmlDecode(source);
+        var encoded = WebUtility.HtmlEncode(source);
+        return $"""<div class="mermaid" data-source="{encoded}">{encoded}</div>""";
+    }
 
     private static string ApplyAutoDirection(this string html)
     {

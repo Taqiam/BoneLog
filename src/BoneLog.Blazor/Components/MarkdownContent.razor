@@ -1,0 +1,25 @@
+@if (!string.IsNullOrWhiteSpace(Content))
+{
+    <div class="@CssClass">
+        @((MarkupString)Content)
+    </div>
+}
+
+@code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    [Parameter] public string? Content { get; set; }
+
+    [Parameter] public string? AdditionalCssClass { get; set; }
+
+    private string CssClass =>
+        string.IsNullOrWhiteSpace(AdditionalCssClass)
+            ? "markdown-content"
+            : $"markdown-content {AdditionalCssClass}";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!string.IsNullOrWhiteSpace(Content))
+            await JS.InvokeVoidAsync("boneLogMarkdown.render");
+    }
+}

@@ -1,9 +1,11 @@
-﻿<div class="not-found">
+﻿@inject NavigationManager Nav
+
+<div class="not-found">
     <p class="not-found__code">404</p>
     <p role="alert" class="not-found__message">
         Sorry, there's nothing at this address.
     </p>
-    <a href="/" class="not-found__link">
+    <a href="@Nav.BaseUri" class="not-found__link">
         Back to Home
     </a>
 </div>

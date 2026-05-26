@@ -1,4 +1,5 @@
 ﻿using BoneLog.Models;
+using BoneLog.Tools;
 
 namespace BoneLog.Blazor.Dtos;
 
@@ -17,7 +18,10 @@ public record SiteConfig(
     NavItemDto[]? NavItems,
     SocialLinkDto[]? SocialLinks,
     int PostsPerPage = 10,
-    SiteFeatures? Features = null)
+    SiteFeatures? Features = null,
+    string BaseDir = "/")
 {
     public SiteFeatures FeaturesOrDefault => Features ?? new SiteFeatures();
+
+    public string NormalizedBaseDir => ContentPathExtensions.NormalizeBaseDir(BaseDir);
 }

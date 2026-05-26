@@ -1180,6 +1180,12 @@ a {
     color: inherit;
 }
 
+.markdown-content .mermaid {
+    margin: 1.75em 0;
+    overflow-x: auto;
+    text-align: center;
+}
+
 .markdown-content img {
     max-width: 100%;
     margin: 2em 0;
