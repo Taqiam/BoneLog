@@ -1,5 +1,5 @@
-import "./vendors/flatpickr.js?v=1.7.6.0";
-import * as utilities from "./utilities.js?v=1.7.6.0";
+import "./vendors/flatpickr.js?v=2.1.2.0";
+import * as utilities from "./utilities.js?v=2.1.2.0";
 
 const _pickers = [];
 
@@ -43,18 +43,24 @@ export function initialize(element, elementId, options) {
     const picker = flatpickr(element, {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "H:i",
+        dateFormat: options.seconds ? "H:i:S" : "H:i",
         allowInput: true,
         altInput: true,
-        altFormat: options.displayFormat ? options.displayFormat : "H:i",
+        altFormat: options.displayFormat ? options.displayFormat : (options.seconds ? "H:i:S" : "H:i"),
         defaultValue: options.default,
+        defaultHour: utilities.coalesce(options.defaultHour, 12),
+        defaultMinute: utilities.coalesce(options.defaultMinute, 0),
         minTime: options.min,
         maxTime: options.max,
         time_24hr: options.timeAs24hr ? options.timeAs24hr : false,
-        clickOpens: !(options.readOnly || false),
+        clickOpens: !(utilities.coalesce(options.readOnly, false)),
         locale: options.localization || {},
-        inline: options.inline || false,
+        inline: utilities.coalesce(options.inline, false),
+        disableMobile: utilities.coalesce(options.disableMobile, true),
         static: options.staticPicker,
+        enableSeconds: options.seconds,
+        hourIncrement: options.hourIncrement,
+        minuteIncrement: options.minuteIncrement,
         onReady: (selectedDates, dateStr, instance) => {
             // move the id from the hidden element to the visible element
             if (instance && instance.input && instance.input.parentElement) {
@@ -67,10 +73,12 @@ export function initialize(element, elementId, options) {
             }
         }
     });
+    picker.classMutationObserver = mutationObserver;
+    picker.disconnectCleanupId = utilities.registerDisconnectCleanup(element, () => destroy(null, elementId, false));
 
     if (options) {
-        picker.altInput.disabled = options.disabled || false;
-        picker.altInput.readOnly = options.readOnly || false;
+        picker.altInput.disabled = utilities.coalesce(options.disabled, false);
+        picker.altInput.readOnly = utilities.coalesce(options.readOnly, false);
         picker.altInput.placeholder = utilities.coalesce(options.placeholder, "");
 
         picker.altInput.addEventListener("blur", (e) => {
@@ -87,12 +95,22 @@ export function initialize(element, elementId, options) {
     _pickers[elementId] = picker;
 }
 
-export function destroy(element, elementId) {
+export function destroy(element, elementId, unregisterCleanup = true) {
     const instances = _pickers || {};
-
     const instance = instances[elementId];
 
-    if (instance) {
+    if (!instance)
+        return;
+
+    if (unregisterCleanup) {
+        utilities.unregisterDisconnectCleanup(instance.disconnectCleanupId);
+    }
+
+    if (instance.classMutationObserver) {
+        instance.classMutationObserver.disconnect();
+    }
+
+    if (typeof instance.destroy === "function") {
         instance.destroy();
     }
 
@@ -137,15 +155,61 @@ export function updateOptions(element, elementId, options) {
         }
 
         if (options.inline.changed) {
-            picker.set("inline", options.inline.value || false);
+            picker.set("inline", utilities.coalesce(options.inline.value, false));
+        }
+
+        if (options.disableMobile.changed) {
+            picker.set("disableMobile", utilities.coalesce(options.disableMobile.value, true));
         }
 
         if (options.placeholder.changed) {
-            picker.altInput.placeholder = options.placeholder.value;
+            picker.altInput.placeholder = utilities.coalesce(options.placeholder.value, "");
         }
 
         if (options.staticPicker.changed) {
             picker.set("static", options.staticPicker.value);
+        }
+
+        if (options.seconds.changed) {
+            picker.set("enableSeconds", options.seconds.value);
+            picker.set("dateFormat", options.seconds.value ? "H:i:S" : "H:i");
+            picker.set("altFormat", options.displayFormat ? options.displayFormat : (options.seconds.value ? "H:i:S" : "H:i"));
+        }
+
+        if (options.hourIncrement.changed) {
+            picker.set("hourIncrement", options.hourIncrement.value);
+
+            if (picker.hourElement) {
+                picker.hourElement.step = options.hourIncrement.value;
+            }
+        }
+
+        if (options.minuteIncrement.changed) {
+            picker.set("minuteIncrement", options.minuteIncrement.value);
+
+            if (picker.minuteElement) {
+                picker.minuteElement.step = options.minuteIncrement.value;
+            }
+        }
+
+        if (options.defaultHour.changed) {
+            picker.set("defaultHour", options.defaultHour.value);
+
+            if (picker.hourElement) {
+                picker.hourElement.value = pad(
+                    !picker.config.time_24hr
+                        ? ((12 + options.defaultHour.value) % 12) + 12 * int(options.defaultHour.value % 12 === 0)
+                        : options.defaultHour.value
+                );
+            }
+        }
+
+        if (options.defaultMinute.changed) {
+            picker.set("defaultMinute", options.defaultMinute.value);
+
+            if (picker.minuteElement) {
+                picker.minuteElement.value = pad(options.defaultMinute.value);
+            }
         }
     }
 }
@@ -173,7 +237,6 @@ export function toggle(element, elementId) {
         picker.toggle();
     }
 }
-
 
 export function updateLocalization(element, elementId, localization) {
     const picker = _pickers[elementId];
@@ -211,4 +274,12 @@ export function select(element, elementId, focus) {
     if (picker && picker.altInput) {
         utilities.select(picker.altInput, null, focus);
     }
+}
+
+function pad(number, length = 2) {
+    return `000${number}`.slice(length * -1);
+}
+
+function int(bool) {
+    return bool === true ? 1 : 0;
 }

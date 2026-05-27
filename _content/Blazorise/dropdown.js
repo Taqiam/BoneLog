@@ -1,11 +1,10 @@
-import { getRequiredElement } from "./utilities.js?v=1.7.6.0";
-import { createFloatingUiAutoUpdate } from './floatingUi.js?v=1.7.6.0';
+import { getRequiredElement, registerDisconnectCleanup, unregisterDisconnectCleanup } from "./utilities.js?v=2.1.2.0";
+import { createFloatingUiAutoUpdate } from './floatingUi.js?v=2.1.2.0';
 
 const _instances = [];
 
 function createSelector(value) {
-    const classNames = '.' + value.split(' ').filter(i => i).join('.');
-
+    const classNames = '.' + value.trim().split(/\s+/).map(CSS.escape).join('.');
     return classNames;
 }
 
@@ -23,24 +22,30 @@ export function initialize(element, elementId, targetElementId, menuElementId, o
         ? document.getElementById(menuElementId)
         : element.querySelector(createSelector(options.dropdownMenuClassNames));
 
-    const instanceCleanupFunction = createFloatingUiAutoUpdate(targetElement, menuElement, options);
-
-    _instances[elementId] = instanceCleanupFunction;
-}
-
-
-export function destroy(element, elementId) {
-    element = getRequiredElement(element, elementId);
-
-    if (!element)
+    if (!targetElement || !menuElement)
         return;
 
+    const instanceCleanupFunction = createFloatingUiAutoUpdate(targetElement, menuElement, options);
+
+    _instances[elementId] = {
+        cleanupFunction: instanceCleanupFunction,
+        disconnectCleanupId: registerDisconnectCleanup(element, () => destroy(null, elementId, false))
+    };
+}
+
+export function destroy(element, elementId, unregisterCleanup = true) {
     const instances = _instances || {};
+    const instance = instances[elementId];
 
-    const instanceCleanupFunction = instances[elementId];
+    if (instance) {
+        if (unregisterCleanup) {
+            unregisterDisconnectCleanup(instance.disconnectCleanupId);
+        }
 
-    if (instanceCleanupFunction) {
-        instanceCleanupFunction();
+        if (instance.cleanupFunction) {
+            instance.cleanupFunction();
+        }
+
         delete instances[elementId];
     }
 }

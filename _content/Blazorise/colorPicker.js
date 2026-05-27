@@ -1,5 +1,5 @@
-import "./vendors/Pickr.js?v=1.7.6.0";
-import * as utilities from "./utilities.js?v=1.7.6.0";
+import "./vendors/Pickr.js?v=2.1.2.0";
+import * as utilities from "./utilities.js?v=2.1.2.0";
 
 const _instancesInfos = [];
 
@@ -9,7 +9,7 @@ export function initialize(dotnetAdapter, element, elementId, options) {
     if (!element)
         return;
 
-    const noDefault = !options.default;
+    const uiFallbackColor = getUiFallbackColor(options.palette);
 
     const picker = Pickr.create({
         el: element,
@@ -18,7 +18,7 @@ export function initialize(dotnetAdapter, element, elementId, options) {
         useAsButton: element,
 
         comparison: false,
-        default: options.default || "#00000000",
+        default: options.default || uiFallbackColor,
         position: 'bottom-start',
         silent: true,
 
@@ -67,16 +67,7 @@ export function initialize(dotnetAdapter, element, elementId, options) {
         }
     });
 
-    if (noDefault) {
-        const resetColor = () => {
-            picker.setColor(null);
-            picker.off('init', resetColor);
-        };
-
-        picker.on('init', resetColor);
-    }
-
-    const hexColor = options.default ? options.default : "#00000000";
+    const hexColor = options.default ? options.default : null;
 
     const colorPreviewElement = element.querySelector(options.colorPreviewElementSelector || ":scope > .b-input-color-picker-preview > .b-input-color-picker-curent-color");
     const colorValueElement = element.querySelector(options.colorValueElementSelector || ":scope > .b-input-color-picker-preview > .b-input-color-picker-curent-value");
@@ -89,9 +80,10 @@ export function initialize(dotnetAdapter, element, elementId, options) {
         colorPreviewElement: colorPreviewElement,
         colorValueElement: colorValueElement,
         hexColor: hexColor,
+        uiFallbackColor: uiFallbackColor,
         palette: options.palette || [],
-        showPalette: options.showPalette || true,
-        hideAfterPaletteSelect: options.hideAfterPaletteSelect || true,
+        showPalette: options.showPalette !== false,
+        hideAfterPaletteSelect: options.hideAfterPaletteSelect !== false,
         showButtons: options.showButtons || true
     };
 
@@ -105,11 +97,12 @@ export function initialize(dotnetAdapter, element, elementId, options) {
 
     picker
         .on('show', (color, instance) => {
-            hexColorShow = color ? color.toHEXA().toString() : null;
+            hexColorShow = instanceInfo.hexColor;
+            instance.setColor(hexColorShow || instanceInfo.uiFallbackColor, true);
         })
         .on("cancel", (instance) => {
             applyHexColor(instanceInfo, hexColorShow);
-            instanceInfo.picker.setColor(hexColorShow, true);
+            instanceInfo.picker.setColor(hexColorShow || instanceInfo.uiFallbackColor, true);
             instanceInfo.picker.hide()
         })
         .on("clear", (instance) => {
@@ -133,8 +126,26 @@ export function initialize(dotnetAdapter, element, elementId, options) {
 }
 
 export function destroy(element, elementId) {
-    const instanceInfo = _instancesInfos || {};
-    delete instanceInfo[elementId];
+    const instances = _instancesInfos || {};
+    const instanceInfo = instances[elementId];
+
+    if (instanceInfo && instanceInfo.picker) {
+        try {
+            if (typeof instanceInfo.picker.destroyAndRemove === "function") {
+                instanceInfo.picker.destroyAndRemove();
+            }
+            else if (typeof instanceInfo.picker.destroy === "function") {
+                instanceInfo.picker.destroy();
+            }
+        }
+        catch (error) {
+            console.error(error);
+        }
+
+        instanceInfo.picker = null;
+    }
+
+    delete instances[elementId];
 }
 
 export function updateValue(element, elementId, hexColor) {
@@ -142,6 +153,7 @@ export function updateValue(element, elementId, hexColor) {
 
     if (instanceInfo) {
         applyHexColor(instanceInfo, hexColor);
+        instanceInfo.picker.setColor(hexColor || instanceInfo.uiFallbackColor, true);
     }
 }
 
@@ -151,6 +163,7 @@ export function updateOptions(element, elementId, options) {
     if (instanceInfo) {
         if (options.palette.changed) {
             instanceInfo.palette = options.palette.value || [];
+            instanceInfo.uiFallbackColor = getUiFallbackColor(instanceInfo.palette);
             instanceInfo.picker.setSwatches(instanceInfo.palette);
         }
 
@@ -224,4 +237,12 @@ export function applyHexColor(instanceInfo, hexColor, force = false) {
             instanceInfo.dotnetAdapter.invokeMethodAsync('SetValue', hexColor);
         }
     }
+}
+
+function getUiFallbackColor(palette) {
+    if (Array.isArray(palette) && palette.length > 0 && palette[0]) {
+        return palette[0];
+    }
+
+    return "#6750A4";
 }

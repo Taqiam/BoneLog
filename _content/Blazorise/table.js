@@ -1,4 +1,4 @@
-import { getRequiredElement } from "./utilities.js?v=1.7.6.0";
+import { getRequiredElement } from "./utilities.js?v=2.1.2.0";
 
 export function initializeTableFixedHeader(element, elementId) {
     element = getRequiredElement(element, elementId);
@@ -8,7 +8,7 @@ export function initializeTableFixedHeader(element, elementId) {
 
     let resizeTimeout = null
 
-    function resizeThottler() {
+    const resizeThottler = () => {
         if (!resizeTimeout) {
             resizeTimeout = setTimeout(function () {
                 resizeTimeout = null;
@@ -20,8 +20,10 @@ export function initializeTableFixedHeader(element, elementId) {
     function resizeHandler(element) {
         const thead = element.querySelector("thead:first-child");
         const tableRows = thead.querySelectorAll("tr");
-        if (tableRows !== null && tableRows.length > 1) {
-            let previousRowCellHeight = 0;
+        if (tableRows !== null && tableRows.length > 0) {
+            const elementStyle = window.getComputedStyle(element);
+            const tableBorderTopWidth = Number.parseFloat(elementStyle.borderTopWidth || "0") || 0;
+            let previousRowCellHeight = tableBorderTopWidth;
             for (let i = 0; i < tableRows.length; i++) {
                 let currentTh = tableRows[i].querySelectorAll("th");
                 currentTh.forEach(x => x.style.top = `${previousRowCellHeight}px`);
@@ -32,7 +34,9 @@ export function initializeTableFixedHeader(element, elementId) {
 
     resizeHandler(element);
 
-    window.addEventListener("resize", this.resizeThottler, false);
+    // Save reference so destroy can remove it
+    element._resizeThottler = resizeThottler;
+    window.addEventListener("resize", element._resizeThottler, false);
 }
 
 export function destroyTableFixedHeader(element, elementId) {
@@ -41,14 +45,14 @@ export function destroyTableFixedHeader(element, elementId) {
     if (!element)
         return;
 
-    if (typeof this.resizeThottler === "function") {
-        window.removeEventListener("resize", this.resizeThottler);
+    if (typeof element._resizeThottler === "function") {
+        window.removeEventListener("resize", element._resizeThottler);
     }
 
     const thead = element.querySelector("thead:first-child");
     const tableRows = thead.querySelectorAll("tr");
 
-    if (tableRows !== null && tableRows.length > 1) {
+    if (tableRows !== null && tableRows.length > 0) {
         for (let i = 0; i < tableRows.length; i++) {
             let currentTh = tableRows[i].querySelectorAll("th");
             currentTh.forEach(x => x.style.top = `${0}px`);

@@ -5,16 +5,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BoneLog</title>
-    <base href="/BoneLog/" />
+    <script src="js/base-path.js"></script>
+    <base href="/" />
     <link rel="stylesheet" href="css/app.css" />
-    <link href="css/tailwind.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="css/prism-tomorrow-night.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <script src="css/prism.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+    <script src="js/bone-log-markdown.js" defer></script>
 
 </head>
-<body class="font-vazir" id="body">
+<body id="body">
 
     <div id="app">
         <svg class="loading-progress">
@@ -44,6 +46,9 @@
                     document.getElementById("body").classList.add('dark');
                 } else {
                     document.getElementById("body").classList.remove('dark');
+                }
+                if (window.boneLogMarkdown?.render) {
+                    window.boneLogMarkdown.render();
                 }
             }
         };

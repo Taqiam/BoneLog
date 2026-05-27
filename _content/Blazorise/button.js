@@ -1,4 +1,4 @@
-import { getRequiredElement } from "./utilities.js?v=1.7.6.0";
+import { getRequiredElement } from "./utilities.js?v=2.1.2.0";
 
 const _instances = [];
 
