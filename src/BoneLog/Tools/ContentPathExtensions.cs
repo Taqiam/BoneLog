@@ -26,6 +26,9 @@ public static partial class ContentPathExtensions
         if (path.StartsWith("//", StringComparison.Ordinal))
             return true;
 
+        if (path.StartsWith('/'))
+            return true;
+
         if (Uri.TryCreate(path, UriKind.Absolute, out var uri))
         {
             return uri.Scheme == Uri.UriSchemeHttp
@@ -34,7 +37,7 @@ public static partial class ContentPathExtensions
                 || uri.Scheme == Uri.UriSchemeMailto;
         }
 
-        return path.StartsWith('/');
+        return false;
     }
 
     public static string CombineRelative(string baseDirectory, string relativePath)
