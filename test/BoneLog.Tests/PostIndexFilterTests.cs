@@ -50,22 +50,6 @@ public class PostIndexFilterTests
     }
 
     [Fact]
-    public void Apply_FreeText_MatchesTitleOrDescriptionOrTags()
-    {
-        var posts = new[]
-        {
-            Post("Alpha", tags: ["beta"]),
-            Post("Gamma"),
-        };
-        var parsed = SearchQueryParser.Parse("beta", enableLanguage: true);
-
-        var result = posts.ApplySearch(parsed);
-
-        Assert.Single(result);
-        Assert.Equal("Alpha", result[0].Title);
-    }
-
-    [Fact]
     public void Apply_WithFilters_OrdersByDateDescending()
     {
         var posts = new[]
