@@ -30,17 +30,8 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    <script src="js/bone-log-host.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script>
-        window.localStorageFunctions = {
-            setItem: function (key, value) {
-                localStorage.setItem(key, value);
-            },
-            getItem: function (key) {
-                return localStorage.getItem(key);
-            }
-        };
-    </script>
 </body>
 
 </html>
