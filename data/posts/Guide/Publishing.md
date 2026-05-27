@@ -13,6 +13,7 @@ Not using GitHub Actions? See **[Full custom hosting](Full-Custom-Hosting)**, do
 | Method | When to use |
 |--------|-------------|
 | **Update index on main** | Auto on push when posts/scripts change; updates `index.json` on `main` only. |
+| **Update data on gh-pages** | Auto after index on main, or manual; syncs full `data/` to `gh-pages`. |
 | **Deploy to GitHub Pages** | Manual full deploy (WASM + data + images) to `gh-pages`. |
 | **Release** (`v*` tags) | GitHub Release + zip + deploy to `gh-pages`. |
 

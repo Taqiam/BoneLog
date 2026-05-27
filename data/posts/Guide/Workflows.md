@@ -11,6 +11,7 @@ shortDescription: "CI, index generation, manual deploy, and tag releases."
 | **CI** | Push / PR to `main` | Build & test (.NET 10). |
 | **Generate Index** | Reusable | Runs `scripts/GenerateIndex.cs`. |
 | **Update index on main** | Push to `posts/**` or `scripts/**` | Commits `index.json` on `main`. |
+| **Update data on gh-pages** | Manual, or after **Update index on main** | Regenerates index and syncs full `data/` (posts, AboutMe, index) to `gh-pages`. |
 | **Deploy to GitHub Pages** | Manual | Full publish → `gh-pages` (sets `<base href>` from `config.json`). |
 | **Release** | Tag `v*` | GitHub Release + deploy → `gh-pages` (sets `<base href>` from `config.json`). |
 
@@ -28,8 +29,9 @@ If **`BaseDataPath` points at another host** (split site + data), regenerating o
 
 ## Typical flow
 
-1. Push post changes → **Update index on main**.
-2. **Deploy to GitHub Pages** (manual) or push `v1.0.0` for **Release**.
+1. Push post changes → **Update index on main** (updates `main`).
+2. **Update data on gh-pages** runs automatically (or run it manually) → syncs full `data/` to the live site (no WASM rebuild).
+3. **Deploy to GitHub Pages** when you need WASM, CSS, new markdown files, images, or `config.json` changes on the live site.
 
 ## See also
 
