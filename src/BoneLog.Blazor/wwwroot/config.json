@@ -1,0 +1,37 @@
+{
+  "Title": "🦴BoneLOG",
+  "BaseDir": "/BoneLog/",
+  "PostsPerPage": 10,
+  "Paths": {
+    "BaseDataPath": "https://taqiam.github.io/BoneLog/data/",
+    "PostsPath": "posts/",
+    "IndexPath": "index.json",
+    "AboutMePath": "AboutMe.md"
+  },
+  "NavItems": [
+    {
+      "Title": "Guide",
+      "Url": "post/Guide/Index"
+    },
+    {
+      "Title": "About",
+      "Url": "about"
+    },
+    {
+      "Title": "GitHub",
+      "Url": "https://github.com/Taqiam/BoneLog"
+    }
+  ],
+  "SocialLinks": [
+    {
+      "Url": "https://github.com/Taqiam",
+      "IconClass": "fab fa-github"
+    }
+  ],
+  "Features": {
+    "CategorySidebar": true,
+    "LanguageSidebar": true,
+    "TagSidebar": true,
+    "EnableMultilanguage": true
+  }
+}

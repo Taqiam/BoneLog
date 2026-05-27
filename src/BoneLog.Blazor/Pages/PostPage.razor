@@ -1,0 +1,88 @@
+﻿@page "/post/{*PostPath}"
+@inject SiteConfig Config
+
+<PageTitle>@((string)(post?.Title ?? "Post"))</PageTitle>
+
+<div class="page-container">
+    @if (isLoading)
+    {
+        <Loading />
+    }
+
+    else if (post is null)
+    {
+        <NotFound />
+    }
+    else
+    {
+        <h1 class="post-header">@post.Title</h1>
+        <div class="post-meta">
+            @if (!string.IsNullOrWhiteSpace(post.Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(post.Language)) || post.Tags?.Length > 0)
+            {
+                <div class="post-meta-groups">
+                    @if (!string.IsNullOrWhiteSpace(post.Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(post.Language)))
+                    {
+                        <div class="post-meta-primary">
+                            @if (!string.IsNullOrWhiteSpace(post.Category))
+                            {
+                                <Category Name="@post.Category" />
+                            }
+                            @if (Config.FeaturesOrDefault.EnableMultilanguage)
+                            {
+                                <Language Code="@post.Language" />
+                            }
+                        </div>
+                    }
+                    @if (post.Tags?.Length > 0)
+                    {
+                        <div class="post-meta-tags">
+                            @foreach (var tag in post.Tags)
+                            {
+                                <Tag TagName="@tag" />
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            @if (post.Date is not null)
+            {
+                <span class="post-meta__date">@post.Date.Value.ToString("MMM dd, yyyy")</span>
+            }
+        </div>
+        @if (!string.IsNullOrWhiteSpace(post.Cover))
+        {
+            <div class="post-cover">
+
+                <img src="@post.Cover" alt="Post image" class="post-cover__image" />
+
+            </div>
+        }
+        <MarkdownContent Content="@post.Content" ContentPath="@post.Path" ContentKind="post" />
+    }
+</div>
+
+
+@code {
+
+    [Inject] IBlogContentProvider Reader { get; set; } = default!;
+
+    [Parameter] public string PostPath { get; set; } = "";
+
+    private bool isLoading = true;
+    private Post? post;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrWhiteSpace(PostPath))
+        {
+            post = null;
+            isLoading = false;
+            return;
+        }
+
+        isLoading = true;
+        post = await Reader.GetPost(PostPath.Trim('/'));
+        isLoading = false;
+    }
+
+}

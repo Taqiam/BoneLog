@@ -1,0 +1,13 @@
+﻿@if (!string.IsNullOrEmpty(TagName))
+{
+    <SearchQueryLink Query="@($"Tag:{TagName}")">
+        <span class="tag">
+            @TagName
+        </span>
+    </SearchQueryLink>
+}
+
+@code {
+    [Parameter]
+    public string? TagName { get; set; }
+}

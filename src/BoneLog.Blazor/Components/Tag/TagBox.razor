@@ -1,0 +1,41 @@
+<aside class="tag-box" aria-label="Tags">
+    <h2 class="tag-box__title">Tags</h2>
+
+    @if (tags.Length == 0)
+    {
+        <p class="tag-box__status">No tags yet.</p>
+    }
+    else
+    {
+        <nav class="tag-box__nav">
+            <div class="tag-box__cloud">
+                @foreach (var entry in tags)
+                {
+                    var isActive = IsTagSelected(entry.Tag);
+                    <SearchQueryLink Query="@($"Tag:{entry.Tag}")"
+                                     Class="@($"tag-box__chip{(isActive ? " tag-box__chip--active" : "")}")">
+                        <span class="tag-box__label">@entry.Tag</span>
+                        <span class="tag-box__count">@entry.Count</span>
+                    </SearchQueryLink>
+                }
+            </div>
+        </nav>
+    }
+</aside>
+
+@code {
+    [Parameter]
+    public string? SelectedTag { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<PostIndex> Posts { get; set; } = [];
+
+    private PostIndexTagEntry[] tags = [];
+
+    protected override void OnParametersSet() =>
+        tags = Posts.GetTags();
+
+    private bool IsTagSelected(string tag) =>
+        !string.IsNullOrEmpty(SelectedTag)
+        && SelectedTag.Equals(tag, StringComparison.OrdinalIgnoreCase);
+}

@@ -1,54 +1,50 @@
 # BoneLOG
-### Easy to use, Free for all
+
+**Live site:** [https://taqiam.github.io/BoneLog/](https://taqiam.github.io/BoneLog/)
+
+**Documentation:** [BoneLog docs (start here)](https://taqiam.github.io/BoneLog/post/Guide/Index)
+
 ---
 
 ## What's this?
 
-Wanna spin up a small blog on GitHub Pages real quick and post your stuff with zero hassle?  
-**BoneLOG** is made just for that.
+A small **file-based blog** on **Blazor WebAssembly**, write Markdown, push to Git, deploy static files. No CMS, no database.
 
-Just write your posts in Markdown, push them, and boom — they go live automatically.  
-No build tools, no CMS, no configs. Just files.
+## Quick start
 
-## Getting Started
+1. [Fork](https://github.com/Taqiam/BoneLog/fork) this repo and enable **GitHub Actions**.
+2. Add posts under [`src/BoneLog.Blazor/wwwroot/data/posts`](src/BoneLog.Blazor/wwwroot/data/posts).
+3. Edit [`config.json`](src/BoneLog.Blazor/wwwroot/config.json), set `BaseDir` (e.g. `"/BoneLog/"`) and `BaseDataPath` (`"data/"`).
+4. **Settings → Pages** → branch **`gh-pages`**, root **`/`**.
+5. Deploy: **Actions → Deploy to GitHub Pages**, or push tag `v1.0.0`.
 
-1. Fork this repo
-2. Enable GitHub Actions in your fork
-3. Add your Markdown posts to:
-   `/src/BoneLog.Blazor/wwwroot/data`
-4. Enable GitHub Pages:
-   - Go to **Settings > Pages**
-   - Choose the `gh-pages` branch as source
-5. (Optional) If you renamed the repo or use a custom domain:
-   - Edit the `base href` in `.github/workflows/full-build.yml`:
-     ```yaml
-     sed -i 's|<base href="/" />|<base href="/YourRepoName/" />|g' ...
-     ```
-   - Or remove these lines if you're using a custom domain.
+Push post changes → **Update index on main** refreshes `index.json`. Deploy again to update the live site.
 
-> [!NOTE]
-> posts.json is generated automatically after each push if GitHub Actions is enabled.
+## Documentation posts
 
-## Customization
+| Topic | Link |
+|-------|------|
+| **Index** | [Documentation hub](https://taqiam.github.io/BoneLog/post/Guide/Index) |
+| Quick start | [GitHub Pages](https://taqiam.github.io/BoneLog/post/Guide/Quick-Start) |
+| Publishing | [Deploy & hosting](https://taqiam.github.io/BoneLog/post/Guide/Publishing) |
+| Custom hosting | [Release zip & any host](https://taqiam.github.io/BoneLog/post/Guide/Full-Custom-Hosting) |
+| Writing | [Posts & Markdown](https://taqiam.github.io/BoneLog/post/Guide/Writing-Posts) |
+| Paths | [Paths & addresses](https://taqiam.github.io/BoneLog/post/Guide/Paths) |
+| Search | [Filters](https://taqiam.github.io/BoneLog/post/Guide/Search-and-Filter) |
+| Config | [config.json](https://taqiam.github.io/BoneLog/post/Guide/Configuration) |
+| Workflows | [GitHub Actions](https://taqiam.github.io/BoneLog/post/Guide/Workflows) |
+| Developers | [Architecture](https://taqiam.github.io/BoneLog/post/Guide/Developer-Overview) |
 
-All data and content are inside:  
-[`/src/BoneLog.Blazor/wwwroot/data`](...)
+## Customize
 
-- To add blog posts → Put `.md` files inside `/data/posts`
-- To create custom pages → Create folders/files like:
-  `/data/projects/project1.md` → will be accessible at `yourdomain.com/data/projects/project1`
-- To change site settings (title, navbar, social links, etc.) → Edit `site-settings.json`
+| Goal | Location |
+|------|----------|
+| Posts | `wwwroot/data/posts/` |
+| About | `wwwroot/data/AboutMe.md` |
+| Settings & nav | `wwwroot/config.json` |
+| Images | `wwwroot/images/` |
+| Styles | `wwwroot/css/app.css` |
 
 ## Contribute
-Dev doors are always open!
-Got a small idea or a feature that might help others too?
-Open a PR and let’s make it happen.
 
-### A final note
-Sure — there are tons of features you could add.
-But honestly? This project is meant to stay small, file-based, and simple.
-
-Let’s not over-architect something that works beautifully in its simplicity.
-
-That said, if you’ve built something cool and think it belongs here —
-send a PR. I'd love to see it.
+PRs welcome, keep small and clear.

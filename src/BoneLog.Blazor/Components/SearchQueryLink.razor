@@ -1,0 +1,23 @@
+@inject NavigationManager Nav
+
+<a href="@Href"
+   class="@Class"
+   @onclick="Navigate"
+   @onclick:preventDefault>
+    @ChildContent
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Query { get; set; } = "";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string Href => $"{Nav.BaseUri}?q={Uri.EscapeDataString(Query)}";
+
+    private void Navigate() => Nav.NavigateTo(Href);
+}

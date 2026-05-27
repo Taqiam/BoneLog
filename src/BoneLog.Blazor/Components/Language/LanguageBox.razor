@@ -1,0 +1,54 @@
+@inject NavigationManager Nav
+
+<aside class="language-box" aria-label="Languages">
+    <h2 class="language-box__title">Language</h2>
+
+    @if (languages.Length == 0)
+    {
+        <p class="language-box__status">No languages yet.</p>
+    }
+    else
+    {
+        <nav class="language-box__nav">
+            <ul class="language-list">
+                <li class="language-list__item">
+                    <a href="@Nav.BaseUri"
+                       class="language-list__link @(string.IsNullOrEmpty(SelectedLanguage) ? "language-list__link--active" : null)"
+                       @onclick="NavigateToAllPosts"
+                       @onclick:preventDefault>
+                        All languages
+                    </a>
+                </li>
+                @foreach (var entry in languages)
+                {
+                    var isActive = IsLanguageSelected(entry.Language);
+                    <li class="language-list__item">
+                        <SearchQueryLink Query="@($"Lang:{entry.Language}")"
+                                         Class="@($"language-list__link{(isActive ? " language-list__link--active" : "")}")">
+                            <span class="language-list__label">@entry.Language</span>
+                            <span class="language-list__count">@entry.Count</span>
+                        </SearchQueryLink>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</aside>
+
+@code {
+    [Parameter]
+    public string? SelectedLanguage { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<PostIndex> Posts { get; set; } = [];
+
+    private PostIndexLanguageEntry[] languages = [];
+
+    protected override void OnParametersSet() => languages = Posts.GetLanguages();
+
+    private void NavigateToAllPosts() => Nav.NavigateTo(Nav.BaseUri);
+
+    private bool IsLanguageSelected(string language) =>
+        !string.IsNullOrEmpty(SelectedLanguage)
+        && SelectedLanguage.Equals(language, StringComparison.OrdinalIgnoreCase);
+}

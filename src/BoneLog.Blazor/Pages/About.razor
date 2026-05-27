@@ -1,41 +1,34 @@
 ﻿@page "/about"
+@inject IBlogContentProvider PostReader
 
-<PageTitle>About</PageTitle>
+<PageTitle>About Me</PageTitle>
 
-<div class="max-w-3xl mx-auto px-4 py-8 text-center">
+<div class="page-container page-container--centered">
 
-    @if(isLoading)
+    @if (about is not null)
     {
-        <Loading />
-    }
-    else if(!aboutExists)
-    {
-        <NotFound />
-    }
-    else
-    {
-        @if(header is not null)
-        {
-            <div class="mb-6">
-                @if(!string.IsNullOrWhiteSpace(header.Avatar))
-                {
-                    <div class="mx-auto w-32 h-32 rounded-full overflow-hidden border border-neutral-300 dark:border-white/20">
-                        <img src="@header.Avatar"
-                             alt="Avatar"
-                             class="w-full h-full object-cover" />
-                    </div>
-                }
+        <div class="about-profile">
+            @if (!string.IsNullOrWhiteSpace(about.Avatar))
+            {
+                <div class="about-avatar-wrap">
+                    <img src="@about.Avatar" alt="Avatar" class="about-avatar" />
+                </div>
+            }
 
-                <h1 class="mt-4 text-2xl font-bold text-inherit">@header.Name</h1>
-
-                <div class="border-t border-neutral-300 dark:border-white/20 my-4 w-1/2 mx-auto"></div>
-
-                <p class="text-sm text-gray-600 dark:text-gray-300">@header.Headline</p>
-            </div>
-        }
-
-        <div class="prose dark:prose-invert max-w-none font-serif text-inherit text-left">
-            @((MarkupString)htmlContent)
+            <h1 class="about-name">@about.Name</h1>
+            <div class="about-divider"></div>
+            @if (!string.IsNullOrWhiteSpace(about.Headline))
+            {
+                <p class="about-headline">@about.Headline</p>
+            }
         </div>
+
+        <MarkdownContent Content="@about.Content" ContentPath="AboutMe.md" ContentKind="page" AdditionalCssClass="markdown-content--left" />
     }
 </div>
+
+@code {
+    private AboutMe? about;
+
+    protected override async Task OnInitializedAsync() => about = await PostReader.GetAboutMe();
+}

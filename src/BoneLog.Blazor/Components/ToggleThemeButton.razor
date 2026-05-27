@@ -1,17 +1,13 @@
 ﻿@inject ThemeService ThemeService
 
 
-<button @onclick="ToggleTheme"
-        class="ml-4 border px-3 py-1 rounded-md border-neutral-300 dark:border-white/10
-           hover:bg-indigo-900/50 transition-colors duration-300 relative overflow-hidden w-14 h-8">
+<button type="button" @onclick="ToggleTheme" class="theme-toggle">
 
-    <span class="absolute inset-0 flex justify-center items-center transition-all duration-300
-                 @(ThemeService.IsDark ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2")">
+    <span class="theme-toggle__icon @(ThemeService.IsDark ? "theme-toggle__icon--visible" : "theme-toggle__icon--hidden")">
         🌚<sub>😎</sub>
     </span>
 
-    <span class="absolute inset-0 flex justify-center items-center transition-all duration-300
-                 @(ThemeService.IsDark ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0")">
+    <span class="theme-toggle__icon @(ThemeService.IsDark ? "theme-toggle__icon--hidden" : "theme-toggle__icon--visible")">
         😎<sub>🌚</sub>
     </span>
 </button>
@@ -23,4 +19,3 @@
     }
     private async Task ToggleTheme() => await ThemeService.ToggleAsync();
 }
-

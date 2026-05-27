@@ -1,109 +1,100 @@
-﻿@page "/"
+@page "/"
+@inject PathSettings PathSettings
 
-<PageTitle>@SiteSettings.Settings?.Title</PageTitle>
+<PageTitle>@Config.Title</PageTitle>
 
-<div class="flex items-center mb-6 w-full max-w-full
-            rounded-xl overflow-hidden
-            border border-neutral-300 dark:border-white/10
-            bg-white dark:bg-stone-950
-            transition-colors duration-200">
-
-    <button @onclick="ClearSearch"
-            title="Clear search input"
-            class="px-4 py-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-300
-                   border-r border-neutral-300 dark:border-white/10
-                   hover:bg-indigo-200 dark:hover:bg-indigo-900/40
-                   transition-colors duration-200">
-        ❌
-    </button>
-
-    <input type="text"
-           value="@searchQuery"
-           @oninput="OnSearchInput"
-           placeholder="Search posts..."
-           class="flex-grow px-4 py-2 bg-transparent text-inherit
-                  focus:outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400" />
-
-    <button @onclick="ReloadPosts"
-            title="Reload posts list from server (bypass cache)"
-            class="px-4 py-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-300
-                   border-l border-neutral-300 dark:border-white/10
-                   hover:bg-indigo-200 dark:hover:bg-indigo-900/40
-                   transition-colors duration-200">
-        🔄
-    </button>
-</div>
-
-
-@if(filteredPosts == null)
-{
-    <Loading />
-}
-else
-{
-    <div class="flex flex-col gap-6">
-        @foreach(var postWithIndex in filteredPosts
-            .Skip((currentPage - 1) * itemsPerPage)
-            .Take(itemsPerPage)
-            .Select((post,i) => (post, i)))
-        {
-            <PostPreview Title="@postWithIndex.post.Title"
-                         Description="@postWithIndex.post.ShortDescription"
-                         Url="@($"post/{postWithIndex.post.FileName}")"
-                         ThumbnailUrl="@postWithIndex.post.Thumbnail"
-                         PublishDate="@postWithIndex.post.Date"
-                         Tags="@postWithIndex.post.Tags.ToList()"
-                         ImageOnRight="@(postWithIndex.i % 2 == 1)" />
-        }
-    </div>
-    @if(filteredPosts.Count > itemsPerPage)
+<div class="home-layout">
+    @if (!isLoading && ShowSidebar)
     {
-        <div class="w-full max-w-md mx-auto mt-10">
-            <div class="grid grid-cols-4 items-center
-                        border border-neutral-300 dark:border-white/10
-                        bg-white dark:bg-stone-950
-                        rounded-md overflow-hidden text-sm">
+        <div class="home-layout__sidebar">
+            @if (ShowCategories)
+            {
+                <CategoryBox SelectedCategory="@SelectedCategory" Posts="allPosts" />
+            }
+            @if (ShowLanguageSidebar)
+            {
+                <LanguageBox SelectedLanguage="@SelectedLanguage" Posts="allPosts" />
+            }
+            @if (ShowTagSidebar)
+            {
+                <TagBox SelectedTag="@SelectedTag" Posts="allPosts" />
+            }
+        </div>
+    }
 
-                <!-- Prev -->
-                <button class="flex items-center justify-center px-4 py-2 text-indigo-700 dark:text-indigo-300
-                               hover:bg-indigo-100 dark:hover:bg-indigo-900/30
-                               transition-colors duration-200
-                               disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled="@(currentPage == 1)"
-                        @onclick="PrevPage">
-                    ‹ Prev
-                </button>
+    <div class="home-layout__main">
+        <div class="search-bar">
 
-                <!-- Middle: Page Text + Input + of -->
-                <div class="col-span-2 flex items-center justify-center gap-2 px-2 py-2 font-medium text-neutral-800 dark:text-neutral-200">
-                    <div>Page</div>
-                    <input id="pageInput"
-                           type="number"
-                           min="1"
-                           max="@pageCount"
-                           value="@currentPage"
-                           @oninput="OnPageInputChanged"
-                           class="w-12 text-center rounded-md
-                                  bg-indigo-100 dark:bg-indigo-900/40
-                                  text-black dark:text-white
-                                  border border-transparent focus:border-indigo-500
-                                  focus:outline-none focus:ring-2 focus:ring-indigo-400
-                                  transition-all duration-200 no-spin" />
-                    <div>of @pageCount</div>
-                </div>
+            <button type="button" @onclick="ClearSearch"
+                    title="Clear search input"
+                    class="search-bar__button search-bar__button--start">
+                ❌
+            </button>
 
-                <!-- Next -->
-                <button class="flex items-center justify-center px-4 py-2 text-indigo-700 dark:text-indigo-300
-                               hover:bg-indigo-100 dark:hover:bg-indigo-900/30
-                               transition-colors duration-200
-                               disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled="@(currentPage == pageCount)"
-                        @onclick="NextPage">
-                    Next ›
-                </button>
-            </div>
+            <input type="text"
+                   value="@searchQuery"
+                   @oninput="OnSearchInput"
+                   placeholder="Search posts..."
+                   class="search-bar__input" />
+
+            <button type="button" @onclick="() => ReloadPosts(true)"
+                    title="Reload posts list from server (bypass cache)"
+                    class="search-bar__button search-bar__button--end">
+                🔄
+            </button>
         </div>
 
+        @if (isLoading)
+        {
+            <Loading />
+        }
+        else
+        {
+            <div class="post-list">
+                @foreach (var postWithIndex in GetCurrentPage().Select((post, i) => (post, i)))
+                {
+                    <PostPreview Title="@postWithIndex.post.Title"
+                                 Description="@postWithIndex.post.ShortDescription"
+                                 Path="@postWithIndex.post.Path"
+                                 ThumbnailUrl="@postWithIndex.post.ResolveThumbnail(PathSettings)"
+                                 PublishDate="@postWithIndex.post.Date"
+                                 Category="@postWithIndex.post.Category"
+                                 Tags="@postWithIndex.post.Tags"
+                                 Language="@postWithIndex.post.Language"
+                                 ImageOnRight="@(postWithIndex.i % 2 == 1)" />
+                }
+            </div>
+            @if (Posts.Length > Config.PostsPerPage)
+            {
+                <div class="pagination">
+                    <div class="pagination__bar">
 
-    }
-}
+                        <button type="button" class="pagination__button"
+                                disabled="@(CurrentPage == 1)"
+                                @onclick="() => CurrentPage--">
+                            ‹ Prev
+                        </button>
+
+                        <div class="pagination__center">
+                            <div>Page</div>
+                            <input id="pageInput"
+                                   type="number"
+                                   min="1"
+                                   max="@PageCount"
+                                   value="@CurrentPage"
+                                   @oninput="OnPageInputChanged"
+                                   class="pagination__input no-spin" />
+                            <div>of @PageCount</div>
+                        </div>
+
+                        <button type="button" class="pagination__button"
+                                disabled="@(CurrentPage == PageCount)"
+                                @onclick="() => CurrentPage++">
+                            Next ›
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

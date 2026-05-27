@@ -1,27 +1,18 @@
 ﻿@using BoneLog.Blazor.Dtos
-@using System.Text.Json
-@inject HttpClient Http
-@inject SiteSettingsService siteSettings
+@inject SiteConfig Config
 
 <nav class="@CssClass">
-    @if(siteSettings.Settings?.NavItems == null)
+    @foreach (var item in Config.NavItems ?? [])
     {
-        <p>Loading Items ...</p>
-    }
-    else
-    {
-        @foreach(var item in siteSettings.Settings.NavItems)
-        {
-            <a class="hover:text-indigo-700 transition" href="@item.Url">@item.Title</a>
-        }
+        <a class="nav-menu__link" href="@item.Url">@item.Title</a>
     }
     @ChildContent
 </nav>
 
 @code {
     [Parameter]
-    public string CssClass { get; set; } = ""; 
-    
+    public string CssClass { get; set; } = "";
+
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 }

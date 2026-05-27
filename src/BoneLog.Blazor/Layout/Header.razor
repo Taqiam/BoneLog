@@ -1,31 +1,26 @@
 ﻿@using BoneLog.Blazor.Components
-@inject HttpClient Http
 @inject NavigationManager Nav
-@inject SiteSettingsService siteSettings;
+@inject SiteConfig Config;
 
 
-<header class="sticky top-0 z-50 bg-inherit border-b border-neutral-200 dark:border-white/10 px-6 py-4">
-    <div class="flex justify-between items-center">
-        <div class="font-serif text-2xl font-bold">
+<header class="site-header">
+    <div class="site-header__inner">
+        <div class="site-header__brand">
             <a href="@Nav.BaseUri">
-                @siteSettings.Settings?.Title
+                @Config.Title
             </a>
         </div>
 
-        <!-- Mobile toggle button -->
-        <button class="lg:hidden text-2xl" @onclick="ToggleMenu">
+        <button type="button" class="site-header__menu-toggle" @onclick="ToggleMenu" aria-label="Toggle menu">
             @(menuOpen ? "✖" : "☰")
         </button>
 
-
-        <!-- Desktop menu -->
-        <NavMenu CssClass="hidden lg:flex items-center space-x-6">
+        <NavMenu CssClass="nav-menu nav-menu--desktop">
             <ToggleThemeButton />
         </NavMenu>
     </div>
 
-    <!-- Mobile menu -->
-    <NavMenu CssClass="@($"flex flex-col items-start space-y-2 mt-4 lg:hidden {(menuOpen ? "" : "hidden")}")">
+    <NavMenu CssClass="@($"nav-menu nav-menu--mobile {(menuOpen ? "" : "nav-menu--hidden")}")">
         <ToggleThemeButton />
     </NavMenu>
 </header>
@@ -34,10 +29,4 @@
     private bool menuOpen = false;
 
     private void ToggleMenu() => menuOpen = !menuOpen;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await siteSettings.LoadAsync();
-    }
 }
-

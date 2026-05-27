@@ -1,0 +1,44 @@
+@inject NavigationManager Nav
+
+<aside class="category-box" aria-label="Categories">
+    <h2 class="category-box__title">Categories</h2>
+
+    @if (categories.Length == 0)
+    {
+        <p class="category-box__status">No categories yet.</p>
+    }
+    else
+    {
+        <nav class="category-box__nav">
+            <ul class="category-tree">
+                <li class="category-tree__item">
+                    <a href="@Nav.BaseUri"
+                       class="category-tree__link @(string.IsNullOrEmpty(SelectedCategory) ? "category-tree__link--active" : null)"
+                       @onclick="NavigateToAllPosts"
+                       @onclick:preventDefault>
+                        <span class="category-tree__label">All posts</span>
+                    </a>
+                </li>
+                @foreach (var category in categories)
+                {
+                    <CategoryTreeNode Category="category"
+                                      SelectedCategory="SelectedCategory" />
+                }
+            </ul>
+        </nav>
+    }
+</aside>
+
+@code {
+    [Parameter]
+    public string? SelectedCategory { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<PostIndex> Posts { get; set; } = [];
+
+    private Models.Category[] categories = [];
+
+    protected override void OnParametersSet() => categories = Posts.GetCategories();
+
+    private void NavigateToAllPosts() => Nav.NavigateTo(Nav.BaseUri);
+}

@@ -1,20 +1,34 @@
-﻿@page "/{**slug}"
+@page "/{**slug}"
+@inject IBlogContentProvider Reader
 
-<div class="max-w-3xl mx-auto px-4 py-8">
+<div class="page-container">
 
-    @if(isLoading)
+    @if (isLoading)
     {
         <Loading />
     }
-    @if(notFound)
+    else if (htmlContent is null)
     {
         <NotFound />
     }
     else
     {
-        <div class="prose dark:prose-invert max-w-none font-serif text-inherit">
-            @((MarkupString)htmlContent)
-        </div>
+        <MarkdownContent Content="@htmlContent" ContentPath="@slug" ContentKind="page" />
     }
 
 </div>
+
+@code {
+
+    [Parameter] public string slug { get; set; } = null!;
+
+    private string? htmlContent = null;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        htmlContent = await Reader.GetContent(slug);
+        isLoading = false;
+    }
+}

@@ -1,0 +1,73 @@
+@{
+    var hasChildren = Category.SubCategories is { Length: > 0 };
+    var isActive = IsCategorySelected(Category.Title);
+}
+
+<li class="category-tree__item @(hasChildren ? "category-tree__item--branch" : "")">
+    <div class="category-tree__row">
+        @if (hasChildren)
+        {
+            <button type="button"
+                    class="category-tree__toggle"
+                    aria-expanded="@isExpanded"
+                    aria-label="@(isExpanded ? "Collapse" : "Expand") @Category.Title"
+                    @onclick="ToggleExpanded">
+                <span class="category-tree__chevron @(isExpanded ? "category-tree__chevron--open" : "")" aria-hidden="true">›</span>
+            </button>
+        }
+        else
+        {
+            <span class="category-tree__toggle-spacer" aria-hidden="true"></span>
+        }
+
+        <SearchQueryLink Query="@($"Cat:{Category.Title}")"
+                         Class="@($"category-tree__link{(isActive ? " category-tree__link--active" : "")}")">
+            <span class="category-tree__label">@Category.Title</span>
+            @if (Category.NumberOfPosts > 0)
+            {
+                <span class="category-tree__count">@Category.NumberOfPosts</span>
+            }
+        </SearchQueryLink>
+    </div>
+
+    @if (hasChildren && isExpanded)
+    {
+        <ul class="category-tree category-tree--nested">
+            @foreach (var sub in Category.SubCategories!)
+            {
+                <CategoryTreeNode Category="sub"
+                                  SelectedCategory="SelectedCategory" />
+            }
+        </ul>
+    }
+</li>
+
+@code {
+    [Parameter, EditorRequired]
+    public BoneLog.Models.Category Category { get; set; } = default!;
+
+    [Parameter]
+    public string? SelectedCategory { get; set; }
+
+    private bool isExpanded;
+
+    protected override void OnParametersSet()
+    {
+        if (Category.SubCategories is { Length: > 0 } subCategories
+            && ContainsSelected(subCategories))
+        {
+            isExpanded = true;
+        }
+    }
+
+    private void ToggleExpanded() => isExpanded = !isExpanded;
+
+    private bool IsCategorySelected(string title) =>
+        !string.IsNullOrEmpty(SelectedCategory)
+        && SelectedCategory.Equals(title, StringComparison.OrdinalIgnoreCase);
+
+    private bool ContainsSelected(BoneLog.Models.Category[] nodes) =>
+        nodes.Any(n =>
+            IsCategorySelected(n.Title)
+            || (n.SubCategories is { Length: > 0 } subs && ContainsSelected(subs)));
+}
