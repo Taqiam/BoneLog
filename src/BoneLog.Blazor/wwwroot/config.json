@@ -1,9 +1,9 @@
 {
   "Title": "🦴BoneLOG",
-  "BaseDir": "/",
+  "BaseDir": "/BoneLog/",
   "PostsPerPage": 10,
   "Paths": {
-    "BaseDataPath": "https://localhost:7215/data/",
+    "BaseDataPath": "https://taqiam.github.io/BoneLog/data/",
     "PostsPath": "posts/",
     "IndexPath": "index.json",
     "AboutMePath": "AboutMe.md"
