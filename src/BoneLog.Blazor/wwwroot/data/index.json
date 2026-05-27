@@ -10,7 +10,7 @@
       "hosting",
       "deploy"
     ],
-    "date": "2026-05-29T03:30:00+03:30",
+    "date": "2026-05-29T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -22,7 +22,7 @@
       "BoneLog",
       "documentation"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -34,7 +34,7 @@
       "BoneLog",
       "documentation"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -47,7 +47,7 @@
       "documentation",
       "developers"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -59,7 +59,7 @@
       "BoneLog",
       "documentation"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -72,7 +72,7 @@
       "documentation",
       "guide"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "thumbnail": "../../../images/Logo.png",
     "language": "EN"
   },
@@ -85,7 +85,7 @@
       "BoneLog",
       "documentation"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -98,7 +98,7 @@
       "documentation",
       "paths"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -111,7 +111,7 @@
       "documentation",
       "deploy"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -124,7 +124,7 @@
       "documentation",
       "github-pages"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -136,7 +136,7 @@
       "BoneLog",
       "documentation"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -149,7 +149,7 @@
       "documentation",
       "css"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -161,7 +161,7 @@
       "BoneLog",
       "documentation"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -174,7 +174,7 @@
       "documentation",
       "ci"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   },
   {
@@ -187,7 +187,7 @@
       "documentation",
       "markdown"
     ],
-    "date": "2026-05-27T03:30:00+03:30",
+    "date": "2026-05-27T00:00:00+00:00",
     "language": "EN"
   }
 ]
