@@ -99,7 +99,7 @@ Example: `https://example.com/blog/`
 }
 ```
 
-`BaseDir` must start and end with `/`. It is read by `js/base-path.js` before the app loads.
+`BaseDir` must start and end with `/`. It must match `<base href>` in `index.html` and `404.html`. Release builds patch both files from `config.json`; if you edit `BaseDir` after upload, update those HTML files too (see [Paths & addresses](Paths)).
 
 Full reference: [Configuration](Configuration) · [Paths & addresses](Paths).
 
@@ -235,6 +235,7 @@ Do not skip this step, without an updated `index.json`, new posts will not appea
 | Downloaded `bonelog-site.zip` (or built locally) | ☐ |
 | Uploaded to static host + SPA fallback | ☐ |
 | Set `BaseDir` for your URL layout | ☐ |
+| `<base href>` in `index.html` and `404.html` matches `BaseDir` | ☐ |
 | Set `BaseDataPath` (`data/` or full data URL) | ☐ |
 | Edited `config.json` title, nav, features | ☐ |
 | Regenerated `index.json` after post changes | ☐ |

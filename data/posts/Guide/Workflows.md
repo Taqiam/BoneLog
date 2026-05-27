@@ -11,8 +11,8 @@ shortDescription: "CI, index generation, manual deploy, and tag releases."
 | **CI** | Push / PR to `main` | Build & test (.NET 10). |
 | **Generate Index** | Reusable | Runs `scripts/GenerateIndex.cs`. |
 | **Update index on main** | Push to `posts/**` or `scripts/**` | Commits `index.json` on `main`. |
-| **Deploy to GitHub Pages** | Manual | Full publish → `gh-pages`. |
-| **Release** | Tag `v*` | GitHub Release + deploy → `gh-pages`. |
+| **Deploy to GitHub Pages** | Manual | Full publish → `gh-pages` (sets `<base href>` from `config.json`). |
+| **Release** | Tag `v*` | GitHub Release + deploy → `gh-pages` (sets `<base href>` from `config.json`). |
 
 ## Generate index locally
 

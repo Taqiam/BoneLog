@@ -11,7 +11,7 @@ File: `src/BoneLog.Blazor/wwwroot/config.json`
 | Key | Description |
 |-----|-------------|
 | `Title` | Site title in the header. |
-| `BaseDir` | App base path (`"/"`, `"/BoneLog/"`). Used by `base-path.js` and routing. |
+| `BaseDir` | App base path (`"/"`, `"/BoneLog/"`). Must match `<base href>` in `index.html` and `404.html`. |
 | `PostsPerPage` | Home page pagination size. |
 | `Paths.BaseDataPath` | Root for fetching markdown/JSON (`data/` on same host, or full URL if data is hosted separately). |
 | `Paths.PostsPath` | Posts folder under data (usually `posts/`). |
@@ -39,6 +39,8 @@ File: `src/BoneLog.Blazor/wwwroot/config.json`
   }
 }
 ```
+
+`BaseDir` must match `<base href="/" />` in `index.html` and `404.html` (source uses `/` for local dev; deploy workflows replace it from this value).
 
 ## Split website and data
 

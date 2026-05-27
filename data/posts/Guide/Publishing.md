@@ -34,7 +34,7 @@ BoneLog is a static WASM app. Any host with SPA fallback works.
 
 | Host | Notes |
 |------|--------|
-| **GitHub Pages** | `gh-pages` branch; set `BaseDir` to your repo path. |
+| **GitHub Pages** | `gh-pages` branch; set `BaseDir` to your repo path. Deploy sets `<base href>` in `index.html` and `404.html`. |
 | **Netlify / Cloudflare Pages** | Deploy publish output; redirect `/*` → `index.html`. |
 | **Azure Static Web Apps** | Configure `navigationFallback`. |
 | **IIS / nginx** | Fallback to `index.html` for client routes. |
