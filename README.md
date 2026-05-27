@@ -14,7 +14,7 @@ A small **file-based blog** on **Blazor WebAssembly**, write Markdown, push to G
 
 1. [Fork](https://github.com/Taqiam/BoneLog/fork) this repo and enable **GitHub Actions**.
 2. Add posts under [`src/BoneLog.Blazor/wwwroot/data/posts`](src/BoneLog.Blazor/wwwroot/data/posts).
-3. Edit [`config.json`](src/BoneLog.Blazor/wwwroot/config.json), set `BaseDir` (e.g. `"/BoneLog/"`) and `BaseDataPath` (`"data/"`).
+3. Edit [`config.json`](src/BoneLog.Blazor/wwwroot/config.json), set `BaseDir` (e.g. `"/BoneLog/"`) and `BaseDataPath` (`"data/"`). Deploy workflows patch `<base href>` in `index.html` and `404.html` from `BaseDir`.
 4. **Settings → Pages** → branch **`gh-pages`**, root **`/`**.
 5. Deploy: **Actions → Deploy to GitHub Pages**, or push tag `v1.0.0`.
 

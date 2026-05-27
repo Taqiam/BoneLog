@@ -48,7 +48,6 @@ wwwroot/
 ├── index.html
 ├── css/
 ├── js/
-│   ├── base-path.js     ← reads BaseDir before app loads
 │   └── bone-log-markdown.js
 ├── images/              ← shared images (optional)
 └── data/
@@ -93,8 +92,9 @@ You edit files under `src/BoneLog.Blazor/wwwroot/` in the repo; deploy copies th
 | `"/"` | Custom domain or site at domain root |
 | `"/BoneLog/"` | GitHub project site: `user.github.io/BoneLog/` |
 
-- Read by `js/base-path.js` **before** CSS/JS load (sets HTML `<base href>`).
-- Blazor routing and relative nav links depend on it.
+- Set in **`index.html`** and **`404.html`** as `<base href="…" />` (must match `BaseDir`).
+- **Deploy to GitHub Pages** and **Release** workflows patch both files from `config.json` automatically.
+- For local dev, keep `<base href="/" />` in source; Blazor routing and relative nav links depend on it.
 - **Must** start and end with `/`.
 
 Wrong: `"BaseDir": "/BoneLog"` → use `"/BoneLog/"`.
@@ -375,7 +375,7 @@ or `"data/"` if the dev server serves `wwwroot` at the same origin.
 
 | Problem | Check |
 |---------|--------|
-| Blank site / 404 on refresh | `BaseDir` matches hosting path (`/RepoName/`). |
+| Blank site / 404 on refresh | `<base href>` in `index.html` and `404.html` matches `BaseDir` (e.g. `/RepoName/`). |
 | Posts don’t load | `BaseDataPath` is `data/` on deploy; file exists at `/data/posts/...`. |
 | Images broken | Relative path from **that** `.md` file; try `../../../images/...` from nested folders. |
 | Nav link goes to domain root | Remove leading `/` in `NavItems` (`about` not `/about`). |

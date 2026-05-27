@@ -25,6 +25,9 @@ jobs:
       - name: Publish Blazor app
         run: dotnet publish src/BoneLog.Blazor/BoneLog.Blazor.csproj -c Release -o release --nologo
 
+      - name: Set base href from config.json
+        run: bash scripts/set-base-href.sh release/wwwroot
+
       - name: Add .nojekyll
         run: touch release/wwwroot/.nojekyll
 

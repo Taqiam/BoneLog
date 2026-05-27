@@ -42,7 +42,7 @@ Edit `config.json`:
 | `BaseDir` | `"/YourRepoName/"` (e.g. `"/BoneLog/"`) | `"/"` |
 | `BaseDataPath` | `"data/"` | `"data/"` |
 
-`BaseDir` is applied at load time by `js/base-path.js` so routes and assets work under a subpath.
+`BaseDir` must start and end with `/`. It must match the `<base href>` in `index.html` and `404.html`. The **Deploy to GitHub Pages** and **Release** workflows set both from `config.json` when publishing; for manual deploys, edit those tags yourself (or run `bash scripts/set-base-href.sh path/to/wwwroot` after publish).
 
 ## 4. Enable GitHub Pages
 
