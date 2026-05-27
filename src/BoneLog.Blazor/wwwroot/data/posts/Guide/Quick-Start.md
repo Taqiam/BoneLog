@@ -59,8 +59,9 @@ Open `https://<user>.github.io/<repo>/`.
 ## 6. Day-to-day updates
 
 1. Edit `.md` files under `data/posts/`.
-2. Push to `main` → **Update index on main** refreshes `index.json`.
-3. Run **Deploy to GitHub Pages** again (or tag a release) to update the live site.
+2. Push to `main` → **Update index on main** refreshes `index.json` on `main`.
+3. **Update data on gh-pages** syncs full `data/` to the live site (runs automatically, or trigger it manually).
+4. Run **Deploy to GitHub Pages** for WASM, `wwwroot/images/`, or `config.json` changes.
 
 ## See also
 

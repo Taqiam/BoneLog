@@ -1,0 +1,54 @@
+name: Update data on gh-pages
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Update index on main"]
+    types: [completed]
+    branches: [main, master]
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Generate index.json
+        run: dotnet run scripts/GenerateIndex.cs -- src/BoneLog.Blazor/wwwroot/data/posts src/BoneLog.Blazor/wwwroot/data/index.json
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Sync data folder to gh-pages
+        run: |
+          rsync -a --delete src/BoneLog.Blazor/wwwroot/data/ gh-pages/data/
+
+      - name: Commit and push to gh-pages
+        working-directory: gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No data changes on gh-pages."
+            exit 0
+          fi
+          git commit -m "chore: update data on gh-pages"
+          git push

@@ -18,7 +18,7 @@ A small **file-based blog** on **Blazor WebAssembly**, write Markdown, push to G
 4. **Settings → Pages** → branch **`gh-pages`**, root **`/`**.
 5. Deploy: **Actions → Deploy to GitHub Pages**, or push tag `v1.0.0`.
 
-Push post changes → **Update index on main** refreshes `index.json`. Deploy again to update the live site.
+Push post changes → **Update index on main** refreshes `index.json` on `main`, then **Update data on gh-pages** syncs full `data/` to the live site (no full deploy). Run **Deploy to GitHub Pages** for WASM, CSS, images under `wwwroot/images/`, or `config.json` changes.
 
 ## Documentation posts
 
