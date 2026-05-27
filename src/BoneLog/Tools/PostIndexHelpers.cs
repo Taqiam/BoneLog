@@ -149,8 +149,7 @@ public static class PostIndexHelpers
 
     private static bool MatchesFreeText(PostIndex post, string term) =>
         post.Title.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-        post.ShortDescription?.Contains(term, StringComparison.OrdinalIgnoreCase) == true ||
-        (post.Tags?.Any(t => t.Contains(term, StringComparison.OrdinalIgnoreCase)) ?? false);
+        (post.ShortDescription?.Contains(term, StringComparison.OrdinalIgnoreCase) == true);
 
     #endregion
 }

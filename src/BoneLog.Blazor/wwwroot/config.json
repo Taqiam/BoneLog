@@ -10,6 +10,10 @@
   },
   "NavItems": [
     {
+      "Title": "Guide",
+      "Url": "post/Guide/Index"
+    },
+    {
       "Title": "About",
       "Url": "about"
     },

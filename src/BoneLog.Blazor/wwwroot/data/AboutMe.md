@@ -1,4 +1,5 @@
-Hi, this is BoneLog
-The documentation is being written, you can now follow the service code from the repo below.
+Hi, this is **BoneLog**, a file-based Blazor blog for static hosting.
 
-https://github.com/taqiam/BoneLog
+Documentation: [BoneLog docs](https://taqiam.github.io/BoneLog/post/Guide/Index)
+
+Source code: [github.com/Taqiam/BoneLog](https://github.com/Taqiam/BoneLog)

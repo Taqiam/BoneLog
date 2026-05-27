@@ -7,6 +7,7 @@ public static partial class ContentPathExtensions
 {
     [GeneratedRegex("""<img\b([^>]*?)\ssrc="([^"]+)"([^>]*)>""", RegexOptions.IgnoreCase)]
     private static partial Regex ImgSrcRegex();
+
     public static string NormalizeBaseDir(string? baseDir)
     {
         var dir = string.IsNullOrWhiteSpace(baseDir) ? "/" : baseDir.Trim();

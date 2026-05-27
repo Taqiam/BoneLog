@@ -23,13 +23,12 @@
             }
         </div>
 
-        <MarkdownContent Content="@about.Content" AdditionalCssClass="markdown-content--left" />
+        <MarkdownContent Content="@about.Content" ContentPath="AboutMe.md" ContentKind="page" AdditionalCssClass="markdown-content--left" />
     }
 </div>
 
 @code {
     private AboutMe? about;
 
-    protected override async Task OnInitializedAsync() =>
-        about = await PostReader.GetAboutMe();
+    protected override async Task OnInitializedAsync() => about = await PostReader.GetAboutMe();
 }

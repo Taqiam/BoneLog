@@ -1,6 +1,11 @@
+@inject PathSettings PathSettings
+
 @if (!string.IsNullOrWhiteSpace(Content))
 {
-    <div class="@CssClass">
+    <div class="@CssClass"
+         data-content-path="@ContentPath"
+         data-content-kind="@ContentKind"
+         data-posts-prefix="@PostsPrefix">
         @((MarkupString)Content)
     </div>
 }
@@ -10,7 +15,14 @@
 
     [Parameter] public string? Content { get; set; }
 
+    [Parameter] public string? ContentPath { get; set; }
+
+    [Parameter] public string ContentKind { get; set; } = "post";
+
     [Parameter] public string? AdditionalCssClass { get; set; }
+
+    private string PostsPrefix =>
+        PathSettings.PostsPath.Trim().Trim('/');
 
     private string CssClass =>
         string.IsNullOrWhiteSpace(AdditionalCssClass)

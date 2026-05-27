@@ -1,0 +1,193 @@
+[
+  {
+    "title": "Full custom hosting",
+    "path": "Guide/Full-Custom-Hosting",
+    "shortDescription": "Download a release build, host anywhere, and point config.json at your site path and optional separate data host.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "hosting",
+      "deploy"
+    ],
+    "date": "2026-05-29T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Configuration reference",
+    "path": "Guide/Configuration",
+    "shortDescription": "Every important key in wwwroot/config.json explained.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Custom pages \u0026 navigation",
+    "path": "Guide/Custom-Pages",
+    "shortDescription": "CatchAll routes for extra Markdown pages and navbar links in config.json.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Developer overview",
+    "path": "Guide/Developer-Overview",
+    "shortDescription": "Short architecture map for contributors \u2014 projects, pipeline, routes.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "developers"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Images \u0026 asset paths",
+    "path": "Guide/Images",
+    "shortDescription": "Put images anywhere under wwwroot, relative paths resolve from each post file.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "BoneLog Documentation",
+    "path": "Guide/Index",
+    "shortDescription": "Start here \u2014 links to every BoneLog setup and usage guide.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "guide"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "thumbnail": "../../../images/Logo.png",
+    "language": "EN"
+  },
+  {
+    "title": "What is BoneLog?",
+    "path": "Guide/Introduction",
+    "shortDescription": "A file-based Blazor WebAssembly blog \u2014 Markdown in, static site out.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Paths \u0026 addresses \u2014 complete guide",
+    "path": "Guide/Paths",
+    "shortDescription": "config.json paths, BaseDir, post URLs, images, relative vs absolute \u2014 everything in one place.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "paths"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Publishing, releases \u0026 static hosting",
+    "path": "Guide/Publishing",
+    "shortDescription": "Manual deploy, version tags, and hosting BoneLog on GitHub Pages or elsewhere.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "deploy"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Quick start on GitHub Pages",
+    "path": "Guide/Quick-Start",
+    "shortDescription": "Fork, configure, enable Pages, and deploy BoneLog in a few steps.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "github-pages"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Search \u0026 filters",
+    "path": "Guide/Search-and-Filter",
+    "shortDescription": "Home page search syntax \u2014 free text, Tag:, Cat:, and Lang: filters.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Styles \u0026 customization",
+    "path": "Guide/Styles",
+    "shortDescription": "Themes, app.css, Prism, dark mode, and RTL markdown.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "css"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Tags, categories \u0026 language",
+    "path": "Guide/Tags-Categories-Language",
+    "shortDescription": "Organize posts with folders, tags, language codes, and sidebar toggles.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "GitHub Actions workflows",
+    "path": "Guide/Workflows",
+    "shortDescription": "CI, index generation, manual deploy, and tag releases.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "ci"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  },
+  {
+    "title": "Writing posts",
+    "path": "Guide/Writing-Posts",
+    "shortDescription": "Front matter, Markdown features, Mermaid diagrams, and post URLs.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "markdown"
+    ],
+    "date": "2026-05-27T03:30:00+03:30",
+    "language": "EN"
+  }
+]

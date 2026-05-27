@@ -13,9 +13,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <script src="css/prism.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+    <script src="js/bone-log-markdown.js" defer></script>
 
 </head>
-<body>
+<body id="body">
 
     <div id="app">
         <svg class="loading-progress">
@@ -38,33 +39,6 @@
             },
             getItem: function (key) {
                 return localStorage.getItem(key);
-            }
-        };
-        window.boneLogMarkdown = {
-            render: async function () {
-                if (window.Prism) {
-                    Prism.highlightAll();
-                }
-                if (!window.mermaid) {
-                    return;
-                }
-                const isDark = document.getElementById("body")?.classList.contains("dark");
-                mermaid.initialize({
-                    startOnLoad: false,
-                    theme: isDark ? "dark" : "default",
-                    securityLevel: "loose"
-                });
-                const nodes = document.querySelectorAll(".markdown-content .mermaid");
-                nodes.forEach(function (node) {
-                    const source = node.getAttribute("data-source");
-                    if (source) {
-                        node.textContent = source;
-                    }
-                    node.removeAttribute("data-processed");
-                });
-                if (nodes.length > 0) {
-                    await mermaid.run({ nodes: Array.from(nodes) });
-                }
             }
         };
     </script>
