@@ -1,3 +1,4 @@
+@using BoneLog.Tools
 @inject SiteConfig Config
 
 <div class="post-preview @(ImageOnRight ? "post-preview--image-right" : "")">
@@ -21,19 +22,24 @@
             </a>
         </div>
         <div class="post-preview__meta">
-            @if (!string.IsNullOrWhiteSpace(Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(Language)) || Tags?.Length > 0)
+            @if (!string.IsNullOrWhiteSpace(Category) || ExtraLanguages?.Length > 0 || Tags?.Length > 0)
             {
                 <div class="post-meta-groups">
-                    @if (!string.IsNullOrWhiteSpace(Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(Language)))
+                    @if (!string.IsNullOrWhiteSpace(Category) || ExtraLanguages?.Length > 0)
                     {
                         <div class="post-meta-primary">
                             @if (!string.IsNullOrWhiteSpace(Category))
                             {
                                 <Category Name="@Category" />
                             }
-                            @if (Config.FeaturesOrDefault.EnableMultilanguage)
+                            @if (ExtraLanguages?.Length > 0)
                             {
-                                <Language Code="@Language" />
+                                @foreach (var language in ExtraLanguages)
+                                {
+                                    <span class="language" lang="@language">
+                                        <span class="language__code">@language.ToUpperInvariant()</span>
+                                    </span>
+                                }
                             }
                         </div>
                     }
@@ -61,17 +67,19 @@
 @code {
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public string Description { get; set; } = string.Empty;
-    [Parameter] public string Path { get; set; } = "#";
+    [Parameter] public string Id { get; set; } = "";
+    [Parameter] public string Slug { get; set; } = "";
+    [Parameter] public string LinkLanguage { get; set; } = PathExtensions.DefaultLanguage;
+    [Parameter] public string[]? ExtraLanguages { get; set; }
     [Parameter] public string? ThumbnailUrl { get; set; }
     [Parameter] public string? Category { get; set; }
     [Parameter] public string[]? Tags { get; set; }
-    [Parameter] public string? Language { get; set; }
     [Parameter] public DateTime? PublishDate { get; set; }
     [Parameter] public bool ImageOnRight { get; set; } = true;
 
     private bool ShowImage = true;
 
-    private string PostHref => $"post/{Path.TrimStart('/')}";
+    private string PostHref => PostIndexHelpers.ToPostUrl(Id, Slug, LinkLanguage);
 
     private void OnImageError()
     {

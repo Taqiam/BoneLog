@@ -17,23 +17,27 @@ public partial class Home : ComponentBase, IDisposable
     [SupplyParameterFromQuery(Name = "q")]
     public string? Q { get; set; }
 
+    [SupplyParameterFromQuery(Name = "lang")]
+    public string? Lang { get; set; }
+
     private bool isLoading = true;
     private string searchQuery = string.Empty;
 
     private PostIndex[] allPosts = [];
+    private PostIndex[] listingPosts = [];
     public PostIndex[] Posts = [];
 
     private SearchQueryParser parsedSearch = SearchQueryParser.Empty;
 
     private string? SelectedCategory => parsedSearch.Categories.LastOrDefault();
-    private string? SelectedLanguage => parsedSearch.Languages.LastOrDefault();
     private string? SelectedTag => parsedSearch.Tags.LastOrDefault();
+    private string? EffectiveLanguageFilter => PostIndexHelpers.ResolveLanguageFilter(Lang, parsedSearch);
+    private string? SelectedLanguage => EffectiveLanguageFilter;
 
-
-    private bool ShowLanguageSidebar => Config.FeaturesOrDefault.EnableMultilanguage && Config.FeaturesOrDefault.LanguageSidebar && allPosts.HaveLanguages();
-    private bool ShowTagSidebar => Config.FeaturesOrDefault.TagSidebar && allPosts.HaveTags();
-    private bool ShowCategories => Config.FeaturesOrDefault.CategorySidebar && allPosts.HaveCategories();
-    private bool ShowSidebar => ShowCategories || ShowLanguageSidebar || ShowTagSidebar;
+    private bool ShowLanguageSidebar => allPosts.HaveLanguages();
+    private bool ShowTagSidebar => Config.FeaturesOrDefault.TagSidebar && listingPosts.HaveTags();
+    private bool ShowCategories => Config.FeaturesOrDefault.CategorySidebar && listingPosts.HaveCategories();
+    private bool ShowSidebar => ShowLanguageSidebar || ShowCategories || ShowTagSidebar;
 
 
     #region Lifecycle Hooks
@@ -61,9 +65,13 @@ public partial class Home : ComponentBase, IDisposable
     private void ApplyQueryFromUri(string uriString)
     {
         var uri = Nav.ToAbsoluteUri(uriString);
-        searchQuery = QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var searchValue)
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        searchQuery = query.TryGetValue("q", out var searchValue)
             ? searchValue.ToString()
             : string.Empty;
+        Lang = query.TryGetValue("lang", out var langValue)
+            ? langValue.ToString()
+            : null;
         ApplySearchQuery();
     }
 
@@ -84,7 +92,7 @@ public partial class Home : ComponentBase, IDisposable
     private void OnSearchInput(ChangeEventArgs e)
     {
         searchQuery = e.Value?.ToString()?.Trim() ?? "";
-        ApplySearchQuery();
+        Nav.NavigateTo(BuildSearchUri(searchQuery));
     }
 
     #endregion
@@ -95,14 +103,13 @@ public partial class Home : ComponentBase, IDisposable
     {
         isLoading = true;
         allPosts = await Reader.GetIndex(ignoreCache);
-        Posts = allPosts;
+        ApplySearchQuery();
         isLoading = false;
     }
 
     private async Task ReloadPosts(bool ignoreCache)
     {
         await LoadAsync(ignoreCache);
-        ApplySearchQuery();
     }
 
     #endregion
@@ -111,12 +118,32 @@ public partial class Home : ComponentBase, IDisposable
 
     private void ApplySearchQuery()
     {
-        parsedSearch = SearchQueryParser.Parse(searchQuery, Config.FeaturesOrDefault.EnableMultilanguage);
-        Posts = allPosts.ApplySearch(parsedSearch);
+        parsedSearch = SearchQueryParser.Parse(searchQuery);
+        var languageFilter = EffectiveLanguageFilter;
+        listingPosts = allPosts.FilterByLanguage(languageFilter);
+        Posts = listingPosts.ApplySearch(parsedSearch, languageFilter);
         CurrentPage = 1;
     }
 
-    private void ClearSearch() => Nav.NavigateTo(Nav.BaseUri, replace: true);
+    private void ClearSearch() => Nav.NavigateTo(BuildSearchUri(string.Empty), replace: true);
+
+    private string BuildSearchUri(string query)
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var parameters = QueryHelpers.ParseQuery(uri.Query);
+
+        if (string.IsNullOrWhiteSpace(query))
+            parameters.Remove("q");
+        else
+            parameters["q"] = query;
+
+        if (PostIndexHelpers.IsAllLanguagesFilter(Lang))
+            parameters.Remove("lang");
+        else if (!string.IsNullOrWhiteSpace(Lang))
+            parameters["lang"] = Lang;
+
+        return QueryHelpers.AddQueryString(uri.GetLeftPart(UriPartial.Path), parameters);
+    }
 
     #endregion
 

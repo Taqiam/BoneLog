@@ -2,12 +2,6 @@ namespace BoneLog.Tests;
 
 public class ContentPathExtensionsTests
 {
-    private static readonly PathSettings Settings = new(
-        "https://example.com/data/",
-        "posts/",
-        "index.json",
-        "AboutMe.md");
-
     [Theory]
     [InlineData(null, "/")]
     [InlineData("", "/")]
@@ -19,74 +13,47 @@ public class ContentPathExtensionsTests
         Assert.Equal(expected, ContentPathExtensions.NormalizeBaseDir(input));
 
     [Theory]
-    [InlineData("https://cdn.example.com/a.png", true)]
-    [InlineData("/images/logo.png", true)]
-    [InlineData("images/logo.png", false)]
-    public void ShouldKeepAssetPathAsIs_DetectsAbsolutePaths(string path, bool expected) =>
-        Assert.Equal(expected, ContentPathExtensions.ShouldKeepAssetPathAsIs(path));
+    [InlineData("/images/Logo.png", "images/Logo.png")]
+    [InlineData("images/Logo.png", "images/Logo.png")]
+    [InlineData("https://cdn.example.com/a.png", "https://cdn.example.com/a.png")]
+    [InlineData("//cdn.example.com/a.png", "//cdn.example.com/a.png")]
+    public void ResolveAssetUrl_RootAndAbsolutePaths(string input, string expected) =>
+        Assert.Equal(expected, ContentPathExtensions.ResolveAssetUrl(input));
 
     [Fact]
-    public void ResolvePostAssetUrl_ResolvesRelativeToPostDirectory()
+    public void ResolveHtmlAssetUrls_RewritesRootImgSrc()
     {
-        var url = ContentPathExtensions.ResolvePostAssetUrl("Catt/FirstPost", "images/Logo.jpg", Settings);
+        var html = """<p><img src="/images/pic.png" alt="pic"></p>""";
+        var resolved = html.ResolveHtmlAssetUrls();
 
-        Assert.Equal("https://example.com/data/posts/Catt/images/Logo.jpg", url);
+        Assert.Contains("src=\"images/pic.png\"", resolved);
     }
 
     [Fact]
-    public void ResolvePostAssetUrl_ResolvesParentSegmentsToSiteImages()
+    public void ResolveHtmlAssetUrls_PreservesSpaceBeforeSrcWhenFirstAttribute()
     {
-        var url = ContentPathExtensions.ResolvePostAssetUrl(
-            "Catt/FirstPost",
-            "../../../images/Logo.jpg",
-            Settings);
+        var html = """<p><img src="/images/Logo.png" alt="cover" /></p>""";
+        var resolved = html.ResolveHtmlAssetUrls();
 
-        Assert.Equal("https://example.com/images/Logo.jpg", url);
-    }
-
-    [Fact]
-    public void ResolvePostAssetUrl_ResolvesSecondPostCoverToSiteImages()
-    {
-        var url = ContentPathExtensions.ResolvePostAssetUrl(
-            "SecondPost",
-            "../../images/Logo.jpg",
-            Settings);
-
-        Assert.Equal("https://example.com/images/Logo.jpg", url);
-    }
-
-    [Fact]
-    public void ResolvePostAssetUrl_KeepsAbsoluteUrl()
-    {
-        const string absolute = "https://cdn.example.com/photo.jpg";
-        var url = ContentPathExtensions.ResolvePostAssetUrl("Catt/FirstPost", absolute, Settings);
-
-        Assert.Equal(absolute, url);
-    }
-
-    [Fact]
-    public void ResolveHtmlAssetUrls_RewritesImgSrcRelativeToPost()
-    {
-        var html = """<p><img src="images/pic.png" alt="pic"></p>""";
-        var resolved = html.ResolveHtmlAssetUrls("Catt/FirstPost", Settings);
-
-        Assert.Contains("src=\"https://example.com/data/posts/Catt/images/pic.png\"", resolved);
+        Assert.Contains("<img src=\"images/Logo.png\"", resolved);
+        Assert.DoesNotContain("<imgsrc=", resolved);
     }
 
     [Fact]
     public void ToPost_ResolvesCoverAndInlineImages()
     {
+        var settings = new PathSettings("data/", "posts/", "index.json", "AboutMe.md");
         var markdown = """
             ---
             title: Test
-            cover: images/cover.jpg
+            cover: /images/cover.jpg
             ---
-            ![inline](images/inline.jpg)
+            ![inline](/images/inline.jpg)
             """;
 
-        var post = markdown.ToPost("Catt/FirstPost", Settings);
+        var post = markdown.ToPost("Catt/FirstPost", settings);
 
-        Assert.Equal("https://example.com/data/posts/Catt/images/cover.jpg", post.Cover);
-        Assert.Contains("https://example.com/data/posts/Catt/images/inline.jpg", post.Content);
+        Assert.Equal("images/cover.jpg", post.Cover);
+        Assert.Contains("<img src=\"images/inline.jpg\"", post.Content);
     }
 }

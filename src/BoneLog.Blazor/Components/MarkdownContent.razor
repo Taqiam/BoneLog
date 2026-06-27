@@ -1,11 +1,13 @@
 @inject PathSettings PathSettings
+@using System.Text.Json
 
 @if (!string.IsNullOrWhiteSpace(Content))
 {
     <div class="@CssClass"
          data-content-path="@ContentPath"
          data-content-kind="@ContentKind"
-         data-posts-prefix="@PostsPrefix">
+         data-posts-prefix="@PostsPrefix"
+         data-post-url-map="@PostUrlMapJson">
         @((MarkupString)Content)
     </div>
 }
@@ -21,8 +23,17 @@
 
     [Parameter] public string? AdditionalCssClass { get; set; }
 
+    [Parameter] public Dictionary<string, string>? PostUrlMap { get; set; }
+
+    private string? _lastRenderedContent;
+
     private string PostsPrefix =>
         PathSettings.PostsPath.Trim().Trim('/');
+
+    private string? PostUrlMapJson =>
+        PostUrlMap is { Count: > 0 }
+            ? JsonSerializer.Serialize(PostUrlMap)
+            : null;
 
     private string CssClass =>
         string.IsNullOrWhiteSpace(AdditionalCssClass)
@@ -31,7 +42,18 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!string.IsNullOrWhiteSpace(Content))
+        if (string.IsNullOrWhiteSpace(Content) || Content == _lastRenderedContent)
+            return;
+
+        _lastRenderedContent = Content;
+
+        try
+        {
             await JS.InvokeVoidAsync("boneLogMarkdown.render");
+        }
+        catch (JSException)
+        {
+            // Script not loaded yet (should not happen after index.html fix).
+        }
     }
 }

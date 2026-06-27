@@ -7,17 +7,17 @@
     @if (!isLoading && ShowSidebar)
     {
         <div class="home-layout__sidebar">
-            @if (ShowCategories)
-            {
-                <CategoryBox SelectedCategory="@SelectedCategory" Posts="allPosts" />
-            }
             @if (ShowLanguageSidebar)
             {
-                <LanguageBox SelectedLanguage="@SelectedLanguage" Posts="allPosts" />
+                <LanguageBox SelectedLanguage="@SelectedLanguage" />
+            }
+            @if (ShowCategories)
+            {
+                <CategoryBox SelectedCategory="@SelectedCategory" Posts="listingPosts" />
             }
             @if (ShowTagSidebar)
             {
-                <TagBox SelectedTag="@SelectedTag" Posts="allPosts" />
+                <TagBox SelectedTag="@SelectedTag" Posts="listingPosts" />
             }
         </div>
     }
@@ -55,12 +55,14 @@
                 {
                     <PostPreview Title="@postWithIndex.post.Title"
                                  Description="@postWithIndex.post.ShortDescription"
-                                 Path="@postWithIndex.post.Path"
-                                 ThumbnailUrl="@postWithIndex.post.ResolveThumbnail(PathSettings)"
+                                 Id="@postWithIndex.post.Id"
+                                 Slug="@postWithIndex.post.Slug"
+                                 LinkLanguage="@postWithIndex.post.GetLinkLanguage(EffectiveLanguageFilter)"
+                                 ExtraLanguages="@postWithIndex.post.GetNonEnglishLanguages()"
+                                 ThumbnailUrl="@postWithIndex.post.ResolveThumbnail()"
                                  PublishDate="@postWithIndex.post.Date"
                                  Category="@postWithIndex.post.Category"
                                  Tags="@postWithIndex.post.Tags"
-                                 Language="@postWithIndex.post.Language"
                                  ImageOnRight="@(postWithIndex.i % 2 == 1)" />
                 }
             </div>

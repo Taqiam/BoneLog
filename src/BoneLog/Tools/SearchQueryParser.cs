@@ -10,7 +10,7 @@ public sealed record SearchQueryParser(IReadOnlyList<string> Tags, IReadOnlyList
 
     public bool IsEmpty => Tags.Count == 0 && Categories.Count == 0 && Languages.Count == 0 && FreeText.Count == 0;
 
-    public static SearchQueryParser Parse(string query, bool enableLanguage)
+    public static SearchQueryParser Parse(string query)
     {
         if (string.IsNullOrWhiteSpace(query)) return Empty;
 
@@ -28,7 +28,7 @@ public sealed record SearchQueryParser(IReadOnlyList<string> Tags, IReadOnlyList
                 continue;
             }
 
-            if (enableLanguage && TryReadFilter(query, ref pos, LangSearchPrefix, languages))
+            if (TryReadFilter(query, ref pos, LangSearchPrefix, languages))
                 continue;
 
             if (TryReadFilter(query, ref pos, CatSearchPrefix, categories))
@@ -71,25 +71,10 @@ public sealed record SearchQueryParser(IReadOnlyList<string> Tags, IReadOnlyList
     {
         for (var i = start; i < query.Length; i++)
         {
-            if (!char.IsWhiteSpace(query[i]))
-                continue;
-
-            var j = i + 1;
-            while (j < query.Length && char.IsWhiteSpace(query[j]))
-                j++;
-
-            if (j >= query.Length)
-                return query.Length;
-
-            if (StartsWithFilterPrefix(query, j))
+            if (char.IsWhiteSpace(query[i]))
                 return i;
         }
 
         return query.Length;
     }
-
-    private static bool StartsWithFilterPrefix(string query, int index) =>
-        query.AsSpan(index).StartsWith(TagSearchPrefix, StringComparison.OrdinalIgnoreCase) ||
-        query.AsSpan(index).StartsWith(CatSearchPrefix, StringComparison.OrdinalIgnoreCase) ||
-        query.AsSpan(index).StartsWith(LangSearchPrefix, StringComparison.OrdinalIgnoreCase);
 }

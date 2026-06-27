@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-06-27T17:57:10.3890095+00:00",
+  "finishedAt": "2026-06-27T17:57:10.5140005+00:00",
+  "durationMs": 124,
+  "mode": "full",
+  "rootPath": "E:\\Development\\BoneLog\\src\\BoneLog.Blazor\\wwwroot\\data\\posts",
+  "indexPath": "E:\\Development\\BoneLog\\src\\BoneLog.Blazor\\wwwroot\\data\\index.json",
+  "postCount": 15,
+  "languageCount": 1,
+  "filesProcessed": 15,
+  "filesSkipped": 0,
+  "updatedCount": 15,
+  "keptCount": 0,
+  "removedCount": 0,
+  "errors": [],
+  "warnings": [],
+  "info": [
+    "Indexed 15 posts from 15 files."
+  ]
+}

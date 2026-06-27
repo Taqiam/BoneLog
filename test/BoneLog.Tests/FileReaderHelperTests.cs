@@ -1,4 +1,4 @@
-﻿namespace BoneLog.Tests;
+namespace BoneLog.Tests;
 
 public class FileReaderHelperTests
 {
@@ -31,31 +31,44 @@ public class FileReaderHelperTests
     }
 
     [Fact]
-    public void Post_Create_MergesFrontMatterPathAndCategory()
+    public void Post_Create_MergesFrontMatterAndFilePath()
     {
         var frontMatter = new PostFrontMatter
         {
+            Id = "123456",
+            Slug = "hello-world",
+            CategoryPath = "Tutorials",
             Title = "Hello World",
             Date = "2025-05-31",
             Tags = ["test"],
             ShortDescription = "Summary"
         };
 
-        var post = Post.Create("tutorials/getting-started", "<p>Hi</p>", frontMatter, "Tutorials");
+        var post = Post.Create("tutorials/getting-started.en", "<p>Hi</p>", frontMatter, "en");
 
         Assert.Equal("Hello World", post.Title);
-        Assert.Equal("tutorials/getting-started", post.Path);
+        Assert.Equal("tutorials/getting-started.en", post.FilePath);
+        Assert.Equal("123456", post.Id);
+        Assert.Equal("hello-world", post.Slug);
         Assert.Equal("<p>Hi</p>", post.Content);
         Assert.Equal("Tutorials", post.Category);
         Assert.Equal("Summary", post.ShortDescription);
         Assert.Equal(new[] { "test" }, post.Tags);
         Assert.Equal(new DateTime(2025, 5, 31), post.Date?.Date);
+        Assert.Equal("en", post.Language);
     }
 
     [Fact]
-    public void Post_Create_FallsBackToPathForCategory()
+    public void Post_Create_UsesCategoryPathFromFrontMatter()
     {
-        var post = Post.Create("dev-journal/my-post", "<p>Hi</p>", null);
+        var frontMatter = new PostFrontMatter
+        {
+            Id = "001",
+            Slug = "my-post",
+            CategoryPath = "Dev Journal"
+        };
+
+        var post = Post.Create("dev-journal/my-post.en", "<p>Hi</p>", frontMatter, "en");
 
         Assert.Equal("Dev Journal", post.Category);
     }

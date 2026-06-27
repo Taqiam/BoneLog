@@ -1,14 +1,13 @@
-#:package YamlDotNet@16.3.0
+#:project ../src/BoneLog/BoneLog.csproj
 #:property JsonSerializerIsReflectionEnabledByDefault=true
 
-using System.Globalization;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+using BoneLog.Models;
+using BoneLog.Tools;
 
 #region Entry
 
@@ -23,6 +22,7 @@ if (options is null)
 var rootPath = Path.GetFullPath(options.RootPath);
 var indexOut = Path.GetFullPath(options.IndexPath);
 var manifestOut = Path.ChangeExtension(indexOut, ".manifest.json");
+var logOut = Path.ChangeExtension(indexOut, ".generation.log.json");
 
 if (!Directory.Exists(rootPath))
 {
@@ -30,17 +30,66 @@ if (!Directory.Exists(rootPath))
     Environment.Exit(1);
 }
 
-var result = options.Full
-    ? IndexBuilder.BuildFull(rootPath)
-    : await IndexBuilder.BuildIncrementalAsync(rootPath, indexOut, manifestOut);
+var stopwatch = Stopwatch.StartNew();
+var report = new GenerationReport
+{
+    StartedAt = DateTimeOffset.UtcNow,
+    Mode = options.Full ? "full" : "incremental",
+    RootPath = rootPath,
+    IndexPath = indexOut
+};
 
-await JsonWriter.WriteAsync(indexOut, result.Posts);
-await JsonWriter.WriteAsync(manifestOut, result.Manifest);
+try
+{
+    var result = options.Full
+        ? IndexBuilder.BuildFull(rootPath, report)
+        : await IndexBuilder.BuildIncrementalAsync(rootPath, indexOut, manifestOut, report);
 
-Console.WriteLine(
-    options.Full
-        ? $"Full build: wrote {result.Posts.Count} posts -> {indexOut}"
-        : $"Updated {result.UpdatedCount}, kept {result.KeptCount}, removed {result.RemovedCount} -> {indexOut}");
+    report.DurationMs = stopwatch.ElapsedMilliseconds;
+    report.PostCount = result.Posts.Count;
+    report.LanguageCount = result.Posts.SelectMany(static p => p.Languages).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+    report.FilesProcessed = result.FilesProcessed;
+    report.FilesSkipped = result.FilesSkipped;
+    report.UpdatedCount = result.UpdatedCount;
+    report.KeptCount = result.KeptCount;
+    report.RemovedCount = result.RemovedCount;
+    report.FinishedAt = DateTimeOffset.UtcNow;
+
+    await JsonWriter.WriteAsync(indexOut, result.Posts);
+    await JsonWriter.WriteAsync(manifestOut, result.Manifest);
+    await JsonWriter.WriteAsync(logOut, report);
+
+    WriteConsoleSummary(report, result);
+
+    if (report.Errors.Count > 0)
+        Environment.Exit(1);
+}
+catch (Exception ex)
+{
+    report.DurationMs = stopwatch.ElapsedMilliseconds;
+    report.FinishedAt = DateTimeOffset.UtcNow;
+    report.Errors.Add(ex.Message);
+    await JsonWriter.WriteAsync(logOut, report);
+    Console.Error.WriteLine($"Fatal: {ex.Message}");
+    Environment.Exit(1);
+}
+
+static void WriteConsoleSummary(GenerationReport report, BuildResult result)
+{
+    foreach (var warning in report.Warnings)
+        Console.WriteLine($"WARNING: {warning}");
+
+    foreach (var error in report.Errors)
+        Console.Error.WriteLine($"ERROR: {error}");
+
+    Console.WriteLine(
+        report.Mode == "full"
+            ? $"Full build: wrote {result.Posts.Count} posts -> {report.IndexPath}"
+            : $"Updated {result.UpdatedCount}, kept {result.KeptCount}, removed {result.RemovedCount} -> {report.IndexPath}");
+
+    Console.WriteLine($"Generation log: {Path.ChangeExtension(report.IndexPath, ".generation.log.json")}");
+    Console.WriteLine($"Duration: {report.DurationMs} ms");
+}
 
 #endregion
 
@@ -70,6 +119,26 @@ sealed record CliOptions(string RootPath, string IndexPath, bool Full)
     }
 }
 
+sealed class GenerationReport
+{
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? FinishedAt { get; set; }
+    public long DurationMs { get; set; }
+    public string Mode { get; set; } = "";
+    public string RootPath { get; set; } = "";
+    public string IndexPath { get; set; } = "";
+    public int PostCount { get; set; }
+    public int LanguageCount { get; set; }
+    public int FilesProcessed { get; set; }
+    public int FilesSkipped { get; set; }
+    public int UpdatedCount { get; set; }
+    public int KeptCount { get; set; }
+    public int RemovedCount { get; set; }
+    public List<string> Errors { get; set; } = [];
+    public List<string> Warnings { get; set; } = [];
+    public List<string> Info { get; set; } = [];
+}
+
 sealed class IndexManifest
 {
     public Dictionary<string, string> Hashes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
@@ -82,28 +151,19 @@ sealed class BuildResult
     public int UpdatedCount { get; init; }
     public int KeptCount { get; init; }
     public int RemovedCount { get; init; }
+    public int FilesProcessed { get; init; }
+    public int FilesSkipped { get; init; }
 }
 
-sealed class PostIndex
+sealed class ParsedVariant
 {
-    public string Title { get; set; } = "";
-    public string Path { get; set; } = "";
-    public string? Content { get; set; }
-    public string? ShortDescription { get; set; }
-    public string? Category { get; set; }
-    public string[]? Tags { get; set; }
-    public DateTime? Date { get; set; }
-    public string? Thumbnail { get; set; }
-    public string Language { get; set; } = "EN";
-}
-sealed class PostFrontMatter
-{
-    public string? Title { get; set; }
-    public string? Date { get; set; }
-    public string[]? Tags { get; set; }
-    public string? Thumbnail { get; set; }
-    public string? ShortDescription { get; set; }
-    public string? Language { get; set; }
+    public required string FilePath { get; init; }
+    public required string Directory { get; init; }
+    public required string BaseName { get; init; }
+    public required string Language { get; init; }
+    public PostFrontMatter? Header { get; init; }
+    public string? Id { get; set; }
+    public string? Slug { get; set; }
 }
 
 #endregion
@@ -112,109 +172,271 @@ sealed class PostFrontMatter
 
 static class IndexBuilder
 {
-    static readonly Regex FrontMatter = new(@"^---\s*\n(.*?)\n---\s*\n(.*)$", RegexOptions.Singleline | RegexOptions.Compiled);
-
-    static readonly IDeserializer Yaml = new DeserializerBuilder()
-        .WithNamingConvention(CamelCaseNamingConvention.Instance)
-        .IgnoreUnmatchedProperties()
-        .Build();
-
-    public static BuildResult BuildFull(string rootPath)
+    public static BuildResult BuildFull(string rootPath, GenerationReport report)
     {
         var root = new DirectoryInfo(rootPath);
-        var posts = new List<PostIndex>();
+        var variants = ParseAllVariants(root, report);
+        var posts = BuildGroupedPosts(variants, report);
         var manifest = new IndexManifest();
 
-        foreach (var file in root.EnumerateFiles("*.md", SearchOption.AllDirectories))
-        {
-            if (!TryParsePost(file, root, out var post))
-                continue;
-
-            posts.Add(post);
-            manifest.Hashes[post.Path] = HashHelper.ComputeFileHash(file.FullName);
-        }
+        foreach (var variant in variants)
+            manifest.Hashes[variant.FilePath] = HashHelper.ComputeFileHash(Path.Combine(root.FullName, variant.FilePath + ".md"));
 
         SortPosts(posts);
+        report.Info.Add($"Indexed {posts.Count} posts from {variants.Count} files.");
+
         return new BuildResult
         {
             Posts = posts,
             Manifest = manifest,
             UpdatedCount = posts.Count,
             KeptCount = 0,
-            RemovedCount = 0
+            RemovedCount = 0,
+            FilesProcessed = variants.Count,
+            FilesSkipped = report.FilesSkipped
         };
     }
 
-    public static async Task<BuildResult> BuildIncrementalAsync(string rootPath, string indexPath, string manifestPath)
+    public static async Task<BuildResult> BuildIncrementalAsync(string rootPath, string indexPath, string manifestPath, GenerationReport report)
     {
         if (!File.Exists(indexPath) || !File.Exists(manifestPath))
-            return BuildFull(rootPath);
+            return BuildFull(rootPath, report);
 
-        var existingPosts = await JsonReader.ReadAsync<PostIndex[]>(indexPath) ?? [];
         var existingManifest = await JsonReader.ReadAsync<IndexManifest>(manifestPath) ?? new IndexManifest();
-
-        var postsByPath = existingPosts.ToDictionary(p => p.Path, StringComparer.OrdinalIgnoreCase);
-        var newHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var root = new DirectoryInfo(rootPath);
+        var variants = ParseAllVariants(root, report);
+        var posts = BuildGroupedPosts(variants, report);
+        var manifest = new IndexManifest();
 
-        var updated = 0;
         var kept = 0;
-
-        foreach (var file in root.EnumerateFiles("*.md", SearchOption.AllDirectories))
+        foreach (var variant in variants)
         {
-            var relativePath = Path.GetRelativePath(root.FullName, file.FullName).Replace('\\', '/');
-            var postPath = Path.ChangeExtension(relativePath, null)!;
-            var hash = HashHelper.ComputeFileHash(file.FullName);
-            newHashes[postPath] = hash;
+            var fullPath = Path.Combine(root.FullName, variant.FilePath + ".md");
+            var hash = HashHelper.ComputeFileHash(fullPath);
+            manifest.Hashes[variant.FilePath] = hash;
 
-            if (existingManifest.Hashes.TryGetValue(postPath, out var previousHash) &&
-                string.Equals(previousHash, hash, StringComparison.OrdinalIgnoreCase) &&
-                postsByPath.TryGetValue(postPath, out var existing))
+            if (existingManifest.Hashes.TryGetValue(variant.FilePath, out var previousHash)
+                && string.Equals(previousHash, hash, StringComparison.OrdinalIgnoreCase))
             {
                 kept++;
-                continue;
-            }
-
-            if (TryParsePost(file, root, out var post))
-            {
-                postsByPath[postPath] = post;
-                updated++;
-            }
-            else
-            {
-                postsByPath.Remove(postPath);
             }
         }
 
-        var removed = 0;
-        foreach (var stalePath in postsByPath.Keys.Except(newHashes.Keys, StringComparer.OrdinalIgnoreCase).ToList())
-        {
-            postsByPath.Remove(stalePath);
-            removed++;
-        }
-
-        var posts = postsByPath.Values.ToList();
         SortPosts(posts);
+        report.Info.Add($"Indexed {posts.Count} posts from {variants.Count} files.");
 
         return new BuildResult
         {
             Posts = posts,
-            Manifest = new IndexManifest { Hashes = newHashes },
-            UpdatedCount = updated,
+            Manifest = manifest,
+            UpdatedCount = variants.Count - kept,
             KeptCount = kept,
-            RemovedCount = removed
+            RemovedCount = Math.Max(0, existingManifest.Hashes.Count - manifest.Hashes.Count),
+            FilesProcessed = variants.Count,
+            FilesSkipped = report.FilesSkipped
         };
     }
 
-    static void SortPosts(List<PostIndex> posts) => posts.Sort(static (a, b) =>
+    static List<ParsedVariant> ParseAllVariants(DirectoryInfo root, GenerationReport report)
     {
-        var cmp = Nullable.Compare(b.Date, a.Date);
-        return cmp != 0 ? cmp : string.Compare(a.Path, b.Path, StringComparison.OrdinalIgnoreCase);
-    });
+        var variants = new List<ParsedVariant>();
 
-    static bool TryParsePost(FileInfo file, DirectoryInfo root, out PostIndex post)
+        foreach (var file in root.EnumerateFiles("*.md", SearchOption.AllDirectories))
+        {
+            if (!TryParseVariant(file, root, out var variant, report))
+            {
+                report.FilesSkipped++;
+                continue;
+            }
+
+            variants.Add(variant);
+        }
+
+        ResolveVariantIdentity(variants, report);
+        return variants;
+    }
+
+    static List<PostIndex> BuildGroupedPosts(List<ParsedVariant> variants, GenerationReport report)
     {
-        post = new PostIndex();
+        var groups = variants
+            .Where(static v => !string.IsNullOrWhiteSpace(v.Id))
+            .GroupBy(static v => v.Id!, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        ValidateGroups(groups, report);
+
+        if (report.Errors.Count > 0)
+            return [];
+
+        var posts = groups.Select(g => MergeGroup(g.ToList(), report)).Where(static p => p is not null).Cast<PostIndex>().ToList();
+        WarnDuplicateSlugs(posts, report);
+        return posts;
+    }
+
+    static void ValidateGroups(List<IGrouping<string, ParsedVariant>> groups, GenerationReport report)
+    {
+        foreach (var group in groups)
+        {
+            var slugs = group.Select(static v => v.Slug).Where(static s => !string.IsNullOrWhiteSpace(s)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            if (slugs.Count > 1)
+            {
+                report.Errors.Add(
+                    $"Duplicate id '{group.Key}' used with different slugs: {string.Join(", ", slugs)}.");
+            }
+
+            var duplicateLanguages = group
+                .GroupBy(static v => v.Language, StringComparer.OrdinalIgnoreCase)
+                .Where(static g => g.Count() > 1)
+                .Select(static g => g.Key)
+                .ToList();
+
+            if (duplicateLanguages.Count > 0)
+            {
+                report.Errors.Add(
+                    $"Post id '{group.Key}' has multiple files for language(s): {string.Join(", ", duplicateLanguages)}.");
+            }
+        }
+
+        var idsByBaseKey = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var variant in variantsWithIdentity(groups))
+        {
+            var key = $"{variant.Directory}/{variant.BaseName}";
+            if (!idsByBaseKey.TryGetValue(key, out var ids))
+            {
+                ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                idsByBaseKey[key] = ids;
+            }
+
+            ids.Add(variant.Id!);
+            if (ids.Count > 1)
+            {
+                report.Errors.Add(
+                    $"Same file name '{variant.BaseName}' in '{variant.Directory}' is used by different ids: {string.Join(", ", ids)}.");
+            }
+        }
+    }
+
+    static IEnumerable<ParsedVariant> variantsWithIdentity(List<IGrouping<string, ParsedVariant>> groups) =>
+        groups.SelectMany(static g => g);
+
+    static void WarnDuplicateSlugs(IReadOnlyList<PostIndex> posts, GenerationReport report)
+    {
+        var slugGroups = posts
+            .GroupBy(static p => p.Slug, StringComparer.OrdinalIgnoreCase)
+            .Where(static g => g.Count() > 1);
+
+        foreach (var group in slugGroups)
+        {
+            var ids = string.Join(", ", group.Select(static p => p.Id));
+            report.Warnings.Add($"Slug '{group.Key}' is shared by multiple posts: {ids}.");
+        }
+    }
+
+    static PostIndex? MergeGroup(List<ParsedVariant> variants, GenerationReport report)
+    {
+        var metadataSource = variants.FirstOrDefault(static v => v.Language == PathExtensions.DefaultLanguage)
+            ?? variants.FirstOrDefault(static v => HasRequiredMetadata(v))
+            ?? variants[0];
+
+        if (!HasRequiredMetadata(metadataSource))
+        {
+            report.Errors.Add(
+                $"Post '{metadataSource.FilePath}' is missing required metadata. English file or a complete front matter (id, slug, categoryPath) is required.");
+            return null;
+        }
+
+        var header = metadataSource.Header ?? new PostFrontMatter
+        {
+            Id = metadataSource.Id,
+            Slug = metadataSource.Slug
+        };
+
+        var localizedTitles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var filePaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var variant in variants.OrderBy(static v => v.Language, StringComparer.OrdinalIgnoreCase))
+        {
+            filePaths[variant.Language] = variant.FilePath;
+
+            if (!variant.Language.Equals(PathExtensions.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(variant.Header?.Title))
+            {
+                localizedTitles[variant.Language] = variant.Header!.Title!;
+            }
+        }
+
+        return new PostIndex
+        {
+            Id = metadataSource.Id!,
+            Slug = metadataSource.Slug!,
+            Title = string.IsNullOrWhiteSpace(header.Title)
+                ? metadataSource.BaseName.SlugToTitle()
+                : header.Title!,
+            ShortDescription = header.ShortDescription,
+            Tags = header.Tags,
+            Thumbnail = header.Thumbnail,
+            Category = header.CategoryPath,
+            Date = PostFrontMatter.ParseDate(header.Date),
+            Languages = filePaths.Keys.OrderBy(static l => l, StringComparer.OrdinalIgnoreCase).ToArray(),
+            LocalizedTitles = localizedTitles.Count > 0 ? localizedTitles : null,
+            FilePaths = filePaths
+        };
+    }
+
+    static bool HasRequiredMetadata(ParsedVariant variant) =>
+        !string.IsNullOrWhiteSpace(variant.Id)
+        && !string.IsNullOrWhiteSpace(variant.Slug)
+        && !string.IsNullOrWhiteSpace(variant.Header?.CategoryPath)
+        && variant.Id.IsPostId();
+
+    static void ResolveVariantIdentity(List<ParsedVariant> variants, GenerationReport report)
+    {
+        var identityByKey = new Dictionary<string, (string Id, string Slug)>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var variant in variants)
+        {
+            if (string.IsNullOrWhiteSpace(variant.Header?.Id))
+                continue;
+
+            if (!variant.Header.Id.TryNormalizePostId(out var normalizedId))
+            {
+                report.Errors.Add($"Invalid post id in {variant.FilePath}.md (use digits only)");
+                continue;
+            }
+
+            variant.Id = normalizedId;
+            variant.Slug = variant.Header.Slug?.Trim();
+
+            if (string.IsNullOrWhiteSpace(variant.Slug))
+            {
+                report.Errors.Add($"Missing slug in {variant.FilePath}.md");
+                continue;
+            }
+
+            identityByKey[$"{variant.Directory}/{variant.BaseName}"] = (variant.Id, variant.Slug);
+        }
+
+        foreach (var variant in variants)
+        {
+            if (!string.IsNullOrWhiteSpace(variant.Id))
+                continue;
+
+            if (!identityByKey.TryGetValue($"{variant.Directory}/{variant.BaseName}", out var identity))
+            {
+                report.Errors.Add(
+                    $"Missing id in {variant.FilePath}.md. Add id/slug front matter or provide an English sibling file.");
+                continue;
+            }
+
+            variant.Id = identity.Id;
+            variant.Slug = identity.Slug;
+            report.Info.Add($"Linked {variant.FilePath}.md to post id '{identity.Id}' by file name.");
+        }
+    }
+
+    static bool TryParseVariant(FileInfo file, DirectoryInfo root, out ParsedVariant variant, GenerationReport report)
+    {
+        variant = null!;
 
         string markdown;
         try
@@ -223,58 +445,37 @@ static class IndexBuilder
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to read {file.Name}: {ex.Message}");
+            report.Errors.Add($"Failed to read {file.Name}: {ex.Message}");
             return false;
         }
 
         var relativePath = Path.GetRelativePath(root.FullName, file.FullName).Replace('\\', '/');
-        var postPath = Path.ChangeExtension(relativePath, null)!;
+        var filePath = Path.ChangeExtension(relativePath, null)!;
+        var directory = Path.GetDirectoryName(relativePath)?.Replace('\\', '/') ?? "";
+        var fileName = Path.GetFileNameWithoutExtension(file.Name);
+        var (baseName, language) = fileName.ParseLanguageFromFileName();
 
-        PostFrontMatter? header = null;
-        var match = FrontMatter.Match(markdown);
-        if (match.Success)
-        {
-            try
-            {
-                header = Yaml.Deserialize<PostFrontMatter>(match.Groups[1].Value.Trim());
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Invalid YAML in {relativePath}: {ex.Message}");
-            }
-        }
-        else
-        {
-            Console.Error.WriteLine($"No front matter in {relativePath}");
-        }
+        var header = markdown.ParsePostFrontMatter();
+        if (header is null && language.Equals(PathExtensions.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+            report.Errors.Add($"No front matter in {relativePath}");
 
-        post.Title = string.IsNullOrWhiteSpace(header?.Title) ? FolderNames.ToTitle(Path.GetFileNameWithoutExtension(file.Name)) : header.Title;
-        post.Path = postPath;
-        post.ShortDescription = header?.ShortDescription;
-        post.Tags = header?.Tags;
-        post.Thumbnail = header?.Thumbnail;
-        post.Category = CategoryPathFromPostPath(postPath);
-        post.Date = ParseDate(header?.Date);
-        post.Language = string.IsNullOrWhiteSpace(header?.Language) ? "EN" : header.Language.Trim();
+        variant = new ParsedVariant
+        {
+            FilePath = filePath,
+            Directory = directory,
+            BaseName = baseName,
+            Language = language,
+            Header = header
+        };
 
         return true;
     }
 
-    static DateTime? ParseDate(string? value)
+    static void SortPosts(List<PostIndex> posts) => posts.Sort(static (a, b) =>
     {
-        if (string.IsNullOrWhiteSpace(value)) return null;
-
-        return DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dt) ? dt : null;
-    }
-
-    static string? CategoryPathFromPostPath(string postPath)
-    {
-        var parts = postPath.Replace('\\', '/').Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length <= 1) return null;
-
-        var folderSegments = parts[..^1];
-        return folderSegments.Length == 0 ? null : string.Join(" / ", folderSegments.Select(FolderNames.ToTitle));
-    }
+        var cmp = Nullable.Compare(b.Date, a.Date);
+        return cmp != 0 ? cmp : PostIdExtensions.ComparePostIds(a.Id, b.Id);
+    });
 }
 
 #endregion
@@ -288,22 +489,6 @@ static class HashHelper
         using var stream = File.OpenRead(filePath);
         var hash = SHA256.HashData(stream);
         return Convert.ToHexString(hash);
-    }
-}
-
-static class FolderNames
-{
-    public static string ToTitle(string folderName)
-    {
-        if (string.IsNullOrWhiteSpace(folderName))
-            return folderName;
-
-        var words = folderName.Split('-', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (words.Length == 0)
-            return folderName;
-
-        return string.Join(' ', words.Select(static w =>
-            char.ToUpperInvariant(w[0]) + (w.Length > 1 ? w[1..].ToLowerInvariant() : "")));
     }
 }
 

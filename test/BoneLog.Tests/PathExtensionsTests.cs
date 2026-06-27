@@ -21,7 +21,32 @@ public class PathExtensionsTests
     public void SlugToTitle_FormatsKebabCase(string slug, string expected) =>
         Assert.Equal(expected, slug.SlugToTitle());
 
-    [Fact]
-    public void CategoryFromPath_JoinsParentFolders() =>
-        Assert.Equal("Dev Journal", "dev-journal/my-post".CategoryFromPath());
+    [Theory]
+    [InlineData("https://github.com/x", "https://github.com/x")]
+    [InlineData("mailto:a@b.c", "mailto:a@b.c")]
+    [InlineData("/about", "about")]
+    [InlineData("posts/en/1/x", "posts/en/1/x")]
+    [InlineData("#section", "#section")]
+    public void ToAppRelativeUrl_KeepsAbsoluteAndStripsLeadingSlash(string input, string expected) =>
+        Assert.Equal(expected, input.ToAppRelativeUrl());
+
+    [Theory]
+    [InlineData("https://x.com", true)]
+    [InlineData("http://x.com", true)]
+    [InlineData("//cdn/x", true)]
+    [InlineData("about", false)]
+    [InlineData("/about", false)]
+    public void IsAbsoluteWebUrl_DetectsFullUrls(string input, bool expected) =>
+        Assert.Equal(expected, input.IsAbsoluteWebUrl());
+
+    [Theory]
+    [InlineData("post.en", "post", "en")]
+    [InlineData("post.fa", "post", "fa")]
+    [InlineData("Writing-Posts", "Writing-Posts", "en")]
+    public void ParseLanguageFromFileName_DetectsLanguageSuffix(string fileName, string baseName, string language)
+    {
+        var parsed = fileName.ParseLanguageFromFileName();
+        Assert.Equal(baseName, parsed.BaseName);
+        Assert.Equal(language, parsed.Language);
+    }
 }

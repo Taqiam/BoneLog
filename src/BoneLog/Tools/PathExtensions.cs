@@ -3,6 +3,7 @@ namespace BoneLog.Tools;
 public static class PathExtensions
 {
     public const string CategorySeparator = " / ";
+    public const string DefaultLanguage = "en";
 
     public static string NormalizeRelativePath(this string path) => path.TrimStart('/').Replace('\\', '/');
 
@@ -13,15 +14,20 @@ public static class PathExtensions
         return $"{root}/{normalized}.md";
     }
 
-    public static string? CategoryFromPath(this string path)
+    public static (string BaseName, string Language) ParseLanguageFromFileName(this string fileNameWithoutExtension)
     {
-        var parts = path.NormalizeRelativePath().Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length <= 1) return null;
+        if (string.IsNullOrWhiteSpace(fileNameWithoutExtension))
+            return (fileNameWithoutExtension, DefaultLanguage);
 
-        var folderSegments = parts[..^1];
-        if (folderSegments.Length == 0) return null;
+        var lastDot = fileNameWithoutExtension.LastIndexOf('.');
+        if (lastDot > 0)
+        {
+            var suffix = fileNameWithoutExtension[(lastDot + 1)..];
+            if (suffix.Length == 2 && suffix.All(char.IsLetter))
+                return (fileNameWithoutExtension[..lastDot], suffix.ToLowerInvariant());
+        }
 
-        return string.Join(CategorySeparator, folderSegments.Select(s => s.SlugToTitle()));
+        return (fileNameWithoutExtension, DefaultLanguage);
     }
 
     public static string SlugToTitle(this string slug)
@@ -39,5 +45,25 @@ public static class PathExtensions
         if (ignoreCache)
             url += (url.Contains('?') ? "&" : "?") + $"nocache={DateTime.UtcNow.Ticks}";
         return url;
+    }
+
+    public static bool IsAbsoluteWebUrl(this string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || url.StartsWith('#'))
+            return false;
+
+        if (url.StartsWith("//", StringComparison.Ordinal))
+            return true;
+
+        return url.Contains("://", StringComparison.Ordinal);
+    }
+
+    /// <summary>App routes and nav links: keep full URLs; otherwise strip leading slashes so &lt;base href&gt; applies.</summary>
+    public static string ToAppRelativeUrl(this string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || url.StartsWith('#') || url.IsAbsoluteWebUrl())
+            return url ?? "";
+
+        return url.TrimStart('/');
     }
 }

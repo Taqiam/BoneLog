@@ -1,4 +1,4 @@
-﻿using BoneLog.Models;
+using BoneLog.Models;
 using BoneLog.Tools;
 
 namespace BoneLog.Blazor.Dtos;
@@ -8,9 +8,7 @@ public record SocialLinkDto(string Url, string IconClass);
 
 public record SiteFeatures(
     bool CategorySidebar = true,
-    bool LanguageSidebar = true,
-    bool TagSidebar = true,
-    bool EnableMultilanguage = true);
+    bool TagSidebar = true);
 
 public record SiteConfig(
     string Title,

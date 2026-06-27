@@ -1,0 +1,14 @@
+@foreach (var language in Index.Languages.OrderBy(static l => l, StringComparer.OrdinalIgnoreCase))
+{
+    var isActive = language.Equals(CurrentLanguage, StringComparison.OrdinalIgnoreCase);
+    <a href="@Index.ToPostUrl(language)"
+       class="language @(isActive ? "language--active" : null)"
+       lang="@language">
+        <span class="language__code">@language.ToUpperInvariant()</span>
+    </a>
+}
+
+@code {
+    [Parameter, EditorRequired] public PostIndex Index { get; set; } = default!;
+    [Parameter, EditorRequired] public string CurrentLanguage { get; set; } = "";
+}

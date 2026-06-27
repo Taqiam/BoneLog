@@ -6,15 +6,16 @@ public class PostIndexFilterTests
         string title,
         string? category = null,
         string[]? tags = null,
-        string language = "EN",
         DateTime? date = null) =>
         new()
         {
             Title = title,
-            Path = title.ToLowerInvariant(),
+            Id = title.ToLowerInvariant(),
+            Slug = title.ToLowerInvariant(),
+            Languages = ["en"],
+            FilePaths = new() { ["en"] = $"{title.ToLowerInvariant()}.en" },
             Category = category,
             Tags = tags,
-            Language = language,
             Date = date,
         };
 
@@ -41,7 +42,7 @@ public class PostIndexFilterTests
             Post("With", tags: ["dotnet"]),
             Post("Without", tags: ["other"]),
         };
-        var parsed = SearchQueryParser.Parse("Tag:dotnet", enableLanguage: true);
+        var parsed = SearchQueryParser.Parse("Tag:dotnet");
 
         var result = posts.ApplySearch(parsed);
 
@@ -54,10 +55,10 @@ public class PostIndexFilterTests
     {
         var posts = new[]
         {
-            Post("Old", language: "EN", date: new DateTime(2020, 1, 1)),
-            Post("New", language: "EN", date: new DateTime(2022, 1, 1)),
+            Post("Old", tags: ["docs"], date: new DateTime(2020, 1, 1)),
+            Post("New", tags: ["docs"], date: new DateTime(2022, 1, 1)),
         };
-        var parsed = SearchQueryParser.Parse("Lang:EN", enableLanguage: true);
+        var parsed = SearchQueryParser.Parse("Tag:docs");
 
         var result = posts.ApplySearch(parsed);
 

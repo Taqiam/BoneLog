@@ -1,4 +1,4 @@
-﻿@page "/about"
+@page "/about"
 @inject IBlogContentProvider PostReader
 
 <PageTitle>About Me</PageTitle>
@@ -23,12 +23,22 @@
             }
         </div>
 
-        <MarkdownContent Content="@about.Content" ContentPath="AboutMe.md" ContentKind="page" AdditionalCssClass="markdown-content--left" />
+        <MarkdownContent Content="@about.Content"
+                         ContentPath="AboutMe.md"
+                         ContentKind="page"
+                         PostUrlMap="@postUrlMap"
+                         AdditionalCssClass="markdown-content--left" />
     }
 </div>
 
 @code {
     private AboutMe? about;
+    private Dictionary<string, string>? postUrlMap;
 
-    protected override async Task OnInitializedAsync() => about = await PostReader.GetAboutMe();
+    protected override async Task OnInitializedAsync()
+    {
+        var index = await PostReader.GetIndex();
+        postUrlMap = index.BuildPostUrlMap();
+        about = await PostReader.GetAboutMe();
+    }
 }

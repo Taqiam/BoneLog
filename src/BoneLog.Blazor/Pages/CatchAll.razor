@@ -13,7 +13,10 @@
     }
     else
     {
-        <MarkdownContent Content="@htmlContent" ContentPath="@slug" ContentKind="page" />
+        <MarkdownContent Content="@htmlContent"
+                         ContentPath="@slug"
+                         ContentKind="page"
+                         PostUrlMap="@postUrlMap" />
     }
 
 </div>
@@ -24,10 +27,13 @@
 
     private string? htmlContent = null;
     private bool isLoading = true;
+    private Dictionary<string, string>? postUrlMap;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        var index = await Reader.GetIndex();
+        postUrlMap = index.BuildPostUrlMap();
         htmlContent = await Reader.GetContent(slug);
         isLoading = false;
     }

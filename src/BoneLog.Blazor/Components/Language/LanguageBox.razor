@@ -1,9 +1,12 @@
 @inject NavigationManager Nav
+@inject IBlogContentProvider Reader
+@using Microsoft.AspNetCore.WebUtilities
+@implements IDisposable
 
 <aside class="language-box" aria-label="Languages">
     <h2 class="language-box__title">Language</h2>
 
-    @if (languages.Length == 0)
+    @if (!showLanguages)
     {
         <p class="language-box__status">No languages yet.</p>
     }
@@ -12,22 +15,19 @@
         <nav class="language-box__nav">
             <ul class="language-list">
                 <li class="language-list__item">
-                    <a href="@Nav.BaseUri"
-                       class="language-list__link @(string.IsNullOrEmpty(SelectedLanguage) ? "language-list__link--active" : null)"
-                       @onclick="NavigateToAllPosts"
-                       @onclick:preventDefault>
-                        All languages
+                    <a href="@BuildHref(null)"
+                       class="@GetLinkClass(null)">
+                        <span class="language-list__label">All languages</span>
                     </a>
                 </li>
                 @foreach (var entry in languages)
                 {
-                    var isActive = IsLanguageSelected(entry.Language);
                     <li class="language-list__item">
-                        <SearchQueryLink Query="@($"Lang:{entry.Language}")"
-                                         Class="@($"language-list__link{(isActive ? " language-list__link--active" : "")}")">
-                            <span class="language-list__label">@entry.Language</span>
+                        <a href="@BuildHref(entry.Language)"
+                           class="@GetLinkClass(entry.Language)">
+                            <span class="language-list__label">@entry.Language.ToUpperInvariant()</span>
                             <span class="language-list__count">@entry.Count</span>
-                        </SearchQueryLink>
+                        </a>
                     </li>
                 }
             </ul>
@@ -36,19 +36,43 @@
 </aside>
 
 @code {
-    [Parameter]
-    public string? SelectedLanguage { get; set; }
-
-    [Parameter]
-    public IReadOnlyList<PostIndex> Posts { get; set; } = [];
+    [Parameter] public string? SelectedLanguage { get; set; }
 
     private PostIndexLanguageEntry[] languages = [];
+    private bool showLanguages;
 
-    protected override void OnParametersSet() => languages = Posts.GetLanguages();
+    protected override async Task OnInitializedAsync()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+        var index = await Reader.GetIndex();
+        languages = index.GetLanguages();
+        showLanguages = index.HaveLanguages();
+    }
 
-    private void NavigateToAllPosts() => Nav.NavigateTo(Nav.BaseUri);
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => StateHasChanged();
 
-    private bool IsLanguageSelected(string language) =>
-        !string.IsNullOrEmpty(SelectedLanguage)
-        && SelectedLanguage.Equals(language, StringComparison.OrdinalIgnoreCase);
+    private string BuildHref(string? language)
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (string.IsNullOrWhiteSpace(language) || PostIndexHelpers.IsAllLanguagesFilter(language))
+            query.Remove("lang");
+        else
+            query["lang"] = language;
+
+        return QueryHelpers.AddQueryString(uri.GetLeftPart(UriPartial.Path), query);
+    }
+
+    private string GetLinkClass(string? language)
+    {
+        var isActive = PostIndexHelpers.IsAllLanguagesFilter(language)
+            ? PostIndexHelpers.IsAllLanguagesFilter(SelectedLanguage)
+            : !string.IsNullOrWhiteSpace(SelectedLanguage)
+              && SelectedLanguage.Equals(language, StringComparison.OrdinalIgnoreCase);
+
+        return isActive ? "language-list__link language-list__link--active" : "language-list__link";
+    }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
 }

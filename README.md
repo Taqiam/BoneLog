@@ -2,38 +2,33 @@
 
 **Live site:** [https://taqiam.github.io/BoneLog/](https://taqiam.github.io/BoneLog/)
 
-**Documentation:** [BoneLog docs (start here)](https://taqiam.github.io/BoneLog/post/Guide/Index)
+**Documentation:** [Start here](https://taqiam.github.io/BoneLog/posts/en/00001/index)
 
 ---
 
 ## What's this?
 
-A small **file-based blog** on **Blazor WebAssembly**, write Markdown, push to Git, deploy static files. No CMS, no database.
+A **file-based Blazor WASM blog** — Markdown in, static site out. Posts use numeric **ids**, **slugs**, and optional language files (`Post.en.md`, `Post.fa.md`).
 
 ## Quick start
 
-1. [Fork](https://github.com/Taqiam/BoneLog/fork) this repo and enable **GitHub Actions**.
-2. Add posts under [`src/BoneLog.Blazor/wwwroot/data/posts`](src/BoneLog.Blazor/wwwroot/data/posts).
-3. Edit [`config.json`](src/BoneLog.Blazor/wwwroot/config.json), set `BaseDir` (e.g. `"/BoneLog/"`) and `BaseDataPath` (`"data/"`). Deploy workflows patch `<base href>` in `index.html` and `404.html` from `BaseDir`.
-4. **Settings → Pages** → branch **`gh-pages`**, root **`/`**.
-5. Deploy: **Actions → Deploy to GitHub Pages**, or push tag `v1.0.0`.
+1. [Fork](https://github.com/Taqiam/BoneLog/fork) and enable **GitHub Actions**
+2. Add posts under `wwwroot/data/posts/` with `id`, `slug`, `categoryPath` in front matter
+3. Set `BaseDir` and `Paths` in [`config.json`](src/BoneLog.Blazor/wwwroot/config.json)
+4. **Settings → Pages** → `gh-pages` / `/`
+5. Run **Deploy to GitHub Pages** or push tag `v1.0.0`
 
-Push post changes → **Update index on main** refreshes `index.json` on `main`, then **Update data on gh-pages** syncs full `data/` to the live site (no full deploy). Run **Deploy to GitHub Pages** for WASM, CSS, images under `wwwroot/images/`, or `config.json` changes.
-
-## Documentation posts
+## Documentation
 
 | Topic | Link |
 |-------|------|
-| **Index** | [Documentation hub](https://taqiam.github.io/BoneLog/post/Guide/Index) |
-| Quick start | [GitHub Pages](https://taqiam.github.io/BoneLog/post/Guide/Quick-Start) |
-| Publishing | [Deploy & hosting](https://taqiam.github.io/BoneLog/post/Guide/Publishing) |
-| Custom hosting | [Release zip & any host](https://taqiam.github.io/BoneLog/post/Guide/Full-Custom-Hosting) |
-| Writing | [Posts & Markdown](https://taqiam.github.io/BoneLog/post/Guide/Writing-Posts) |
-| Paths | [Paths & addresses](https://taqiam.github.io/BoneLog/post/Guide/Paths) |
-| Search | [Filters](https://taqiam.github.io/BoneLog/post/Guide/Search-and-Filter) |
-| Config | [config.json](https://taqiam.github.io/BoneLog/post/Guide/Configuration) |
-| Workflows | [GitHub Actions](https://taqiam.github.io/BoneLog/post/Guide/Workflows) |
-| Developers | [Architecture](https://taqiam.github.io/BoneLog/post/Guide/Developer-Overview) |
+| **Hub** | [Documentation](https://taqiam.github.io/BoneLog/posts/en/00001/index) |
+| Quick start | [00003](https://taqiam.github.io/BoneLog/posts/en/00003/quick-start) |
+| Writing | [00004](https://taqiam.github.io/BoneLog/posts/en/00004/writing-posts) |
+| Paths | [00007](https://taqiam.github.io/BoneLog/posts/en/00007/paths) |
+| Config | [00009](https://taqiam.github.io/BoneLog/posts/en/00009/configuration) |
+| Publishing | [00011](https://taqiam.github.io/BoneLog/posts/en/00011/publishing) |
+| Developers | [00015](https://taqiam.github.io/BoneLog/posts/en/00015/developer-overview) |
 
 ## Customize
 
@@ -41,10 +36,7 @@ Push post changes → **Update index on main** refreshes `index.json` on `main`,
 |------|----------|
 | Posts | `wwwroot/data/posts/` |
 | About | `wwwroot/data/AboutMe.md` |
-| Settings & nav | `wwwroot/config.json` |
-| Images | `wwwroot/images/` |
+| Settings | `wwwroot/config.json` |
 | Styles | `wwwroot/css/app.css` |
 
-## Contribute
-
-PRs welcome, keep small and clear.
+PRs welcome.

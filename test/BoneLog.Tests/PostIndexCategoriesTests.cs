@@ -11,7 +11,7 @@ public class PostIndexCategoriesTests
     [Fact]
     public void GetCategories_SingleCategory_CountsPost()
     {
-        var posts = new[] { new PostIndex { Title = "A", Path = "a", Category = "Dev Journal" } };
+        var posts = new[] { new PostIndex { Title = "A", Id = "1", Slug = "a", Languages = ["en"], FilePaths = new() { ["en"] = "a.en" }, Category = "Dev Journal" } };
 
         var tree = posts.GetCategories();
 
@@ -26,9 +26,9 @@ public class PostIndexCategoriesTests
     {
         var posts = new[]
         {
-            new PostIndex { Title = "A", Path = "a", Category = "Dev Journal / Tutorials" },
-            new PostIndex { Title = "B", Path = "b", Category = "Dev Journal / News" },
-            new PostIndex { Title = "C", Path = "c", Category = "Dev Journal / Tutorials" },
+            new PostIndex { Title = "A", Id = "1", Slug = "a", Languages = ["en"], FilePaths = new() { ["en"] = "a.en" }, Category = "Dev Journal / Tutorials" },
+            new PostIndex { Title = "B", Id = "2", Slug = "b", Languages = ["en"], FilePaths = new() { ["en"] = "b.en" }, Category = "Dev Journal / News" },
+            new PostIndex { Title = "C", Id = "3", Slug = "c", Languages = ["en"], FilePaths = new() { ["en"] = "c.en" }, Category = "Dev Journal / Tutorials" },
         };
 
         var tree = posts.GetCategories();

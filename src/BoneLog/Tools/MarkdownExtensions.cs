@@ -2,12 +2,19 @@ using BoneLog.Models;
 using Markdig;
 using System.Net;
 using System.Text.RegularExpressions;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace BoneLog.Tools;
 
 public static partial class MarkdownExtensions
 {
     private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+
+    private static readonly IDeserializer FrontMatterDeserializer = new DeserializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .IgnoreUnmatchedProperties()
+        .Build();
 
     [GeneratedRegex(@"^---\s*\n(.*?)\n---\s*\n(.*)$", RegexOptions.Singleline)]
     private static partial Regex FrontMatterRegex();
@@ -30,6 +37,25 @@ public static partial class MarkdownExtensions
         return match.Success ? match.Groups[2].Value.TrimStart() : markdown;
     }
 
+    public static PostFrontMatter? ParsePostFrontMatter(this string markdown)
+    {
+        if (string.IsNullOrWhiteSpace(markdown))
+            return null;
+
+        var match = FrontMatterRegex().Match(markdown);
+        if (!match.Success)
+            return null;
+
+        try
+        {
+            return FrontMatterDeserializer.Deserialize<PostFrontMatter>(match.Groups[1].Value.Trim());
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static (PostFrontMatter?, string Html) ToHtmlWithPostFrontMatter(this string markdown) =>
         markdown.ToHtmlWithFrontMatter<PostFrontMatter>();
 
@@ -43,12 +69,11 @@ public static partial class MarkdownExtensions
             return (null, markdown.ToHtml());
 
         var yamlContent = match.Groups[1].Value.Trim();
-        var markdownBody = match.Groups[2].Value.Trim();
-        var htmlBody = markdownBody.ToHtml();
+        var htmlBody = match.Groups[2].Value.Trim().ToHtml();
 
         try
         {
-            var header = yamlContent.DeserializeFrontMatter<T>();
+            var header = FrontMatterDeserializer.Deserialize<T>(yamlContent);
             return (header, htmlBody);
         }
         catch
@@ -57,29 +82,33 @@ public static partial class MarkdownExtensions
         }
     }
 
-    public static Post ToPost(this string markdown, string normalizedPath, PathSettings pathSettings)
+    public static Post ToPost(this string markdown, string normalizedPath, PathSettings pathSettings, PostFrontMatter? englishFrontMatter = null, string? languageOverride = null)
     {
         var (frontMatter, htmlContent) = markdown.ToHtmlWithPostFrontMatter();
-        htmlContent = htmlContent.ResolveHtmlAssetUrls(normalizedPath, pathSettings);
+        htmlContent = htmlContent.ResolveHtmlAssetUrls();
 
-        var post = Post.Create(normalizedPath, htmlContent, frontMatter);
-        post.Cover = ContentPathExtensions.ResolvePostAssetUrl(normalizedPath, post.Cover, pathSettings);
-        post.Thumbnail = ContentPathExtensions.ResolvePostAssetUrl(normalizedPath, post.Thumbnail, pathSettings);
+        var fileName = Path.GetFileNameWithoutExtension(normalizedPath);
+        var (_, languageFromFile) = fileName.ParseLanguageFromFileName();
+        var language = languageOverride ?? languageFromFile;
+        var mergedFrontMatter = PostFrontMatter.MergeForLanguage(englishFrontMatter, frontMatter, language);
+        var post = Post.Create(normalizedPath, htmlContent, mergedFrontMatter, language);
+        post.Cover = ContentPathExtensions.ResolveAssetUrl(post.Cover);
+        post.Thumbnail = ContentPathExtensions.ResolveAssetUrl(post.Thumbnail);
         return post;
     }
 
     public static AboutMe ToAboutMe(this string markdown, PathSettings pathSettings, string markdownRelativePath = "AboutMe.md")
     {
         var (frontMatter, htmlContent) = markdown.ToHtmlWithFrontMatter<AboutMeFrontMatter>();
-        htmlContent = htmlContent.ResolveHtmlAssetUrls(markdownRelativePath, pathSettings, isPost: false);
+        htmlContent = htmlContent.ResolveHtmlAssetUrls();
 
         var about = AboutMe.Create(frontMatter, htmlContent);
-        about.Avatar = ContentPathExtensions.ResolveDataFileAssetUrl(markdownRelativePath, about.Avatar, pathSettings);
+        about.Avatar = ContentPathExtensions.ResolveAssetUrl(about.Avatar);
         return about;
     }
 
-    public static string ToHtmlBody(this string markdown, string contentRelativePath, PathSettings pathSettings, bool isPost = false) =>
-        markdown.WithoutFrontMatter().ToHtml().ResolveHtmlAssetUrls(contentRelativePath, pathSettings, isPost);
+    public static string ToHtmlBody(this string markdown, PathSettings pathSettings) =>
+        markdown.WithoutFrontMatter().ToHtml().ResolveHtmlAssetUrls();
 
     private static string ApplyMermaid(this string html)
     {

@@ -1,10 +1,11 @@
-﻿@using BoneLog.Blazor.Dtos
+@using BoneLog.Blazor.Dtos
+@using BoneLog.Tools
 @inject SiteConfig Config
 
 <nav class="@CssClass">
     @foreach (var item in Config.NavItems ?? [])
     {
-        <a class="nav-menu__link" href="@item.Url">@item.Title</a>
+        <a class="nav-menu__link" href="@item.Url.ToAppRelativeUrl()">@item.Title</a>
     }
     @ChildContent
 </nav>

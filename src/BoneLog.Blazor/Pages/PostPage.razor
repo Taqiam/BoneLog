@@ -1,4 +1,4 @@
-﻿@page "/post/{*PostPath}"
+@page "/posts/{Language}/{Id}/{Slug}"
 @inject SiteConfig Config
 
 <PageTitle>@((string)(post?.Title ?? "Post"))</PageTitle>
@@ -17,19 +17,19 @@
     {
         <h1 class="post-header">@post.Title</h1>
         <div class="post-meta">
-            @if (!string.IsNullOrWhiteSpace(post.Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(post.Language)) || post.Tags?.Length > 0)
+            @if (!string.IsNullOrWhiteSpace(post.Category) || indexEntry?.Languages.Length > 1 || post.Tags?.Length > 0)
             {
                 <div class="post-meta-groups">
-                    @if (!string.IsNullOrWhiteSpace(post.Category) || (Config.FeaturesOrDefault.EnableMultilanguage && !string.IsNullOrWhiteSpace(post.Language)))
+                    @if (!string.IsNullOrWhiteSpace(post.Category) || indexEntry?.Languages.Length > 1)
                     {
                         <div class="post-meta-primary">
                             @if (!string.IsNullOrWhiteSpace(post.Category))
                             {
                                 <Category Name="@post.Category" />
                             }
-                            @if (Config.FeaturesOrDefault.EnableMultilanguage)
+                            @if (indexEntry is not null && indexEntry.Languages.Length > 1)
                             {
-                                <Language Code="@post.Language" />
+                                <PostLanguageSwitcher Index="@indexEntry" CurrentLanguage="@Language" />
                             }
                         </div>
                     }
@@ -52,37 +52,43 @@
         @if (!string.IsNullOrWhiteSpace(post.Cover))
         {
             <div class="post-cover">
-
                 <img src="@post.Cover" alt="Post image" class="post-cover__image" />
-
             </div>
         }
-        <MarkdownContent Content="@post.Content" ContentPath="@post.Path" ContentKind="post" />
+        <MarkdownContent Content="@post.Content"
+                         ContentPath="@post.FilePath"
+                         ContentKind="post"
+                         PostUrlMap="@postUrlMap" />
     }
 </div>
 
-
 @code {
-
     [Inject] IBlogContentProvider Reader { get; set; } = default!;
 
-    [Parameter] public string PostPath { get; set; } = "";
+    [Parameter] public string Language { get; set; } = "";
+    [Parameter] public string Id { get; set; } = "";
+    [Parameter] public string Slug { get; set; } = "";
 
     private bool isLoading = true;
     private Post? post;
+    private PostIndex? indexEntry;
+    private Dictionary<string, string>? postUrlMap;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrWhiteSpace(PostPath))
+        if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(Language) || !Id.TryNormalizePostId(out var normalizedId))
         {
             post = null;
+            indexEntry = null;
             isLoading = false;
             return;
         }
 
         isLoading = true;
-        post = await Reader.GetPost(PostPath.Trim('/'));
+        var index = await Reader.GetIndex();
+        postUrlMap = index.BuildPostUrlMap();
+        indexEntry = await Reader.GetPostIndexEntry(normalizedId);
+        post = await Reader.GetPostByIdAndLanguage(normalizedId, Language);
         isLoading = false;
     }
-
 }
