@@ -1,193 +1,281 @@
 [
   {
-    "title": "Full custom hosting",
-    "path": "Guide/Full-Custom-Hosting",
-    "shortDescription": "Download a release build, host anywhere, and point config.json at your site path and optional separate data host.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation",
-      "hosting",
-      "deploy"
-    ],
-    "date": "2026-05-29T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "Configuration reference",
-    "path": "Guide/Configuration",
-    "shortDescription": "Every important key in wwwroot/config.json explained.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "Custom pages \u0026 navigation",
-    "path": "Guide/Custom-Pages",
-    "shortDescription": "CatchAll routes for extra Markdown pages and navbar links in config.json.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "Developer overview",
-    "path": "Guide/Developer-Overview",
-    "shortDescription": "Short architecture map for contributors \u2014 projects, pipeline, routes.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation",
-      "developers"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "Images \u0026 asset paths",
-    "path": "Guide/Images",
-    "shortDescription": "Put images anywhere under wwwroot, relative paths resolve from each post file.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
+    "id": "00001",
+    "slug": "index",
     "title": "BoneLog Documentation",
-    "path": "Guide/Index",
-    "shortDescription": "Start here \u2014 links to every BoneLog setup and usage guide.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation",
-      "guide"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "thumbnail": "../../../images/Logo.png",
-    "language": "EN"
-  },
-  {
-    "title": "What is BoneLog?",
-    "path": "Guide/Introduction",
-    "shortDescription": "A file-based Blazor WebAssembly blog \u2014 Markdown in, static site out.",
+    "shortDescription": "Start here \u2014 setup, writing, and deployment.",
     "category": "Guide",
     "tags": [
       "BoneLog",
       "documentation"
     ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
+    "date": "2026-06-27T00:00:00+00:00",
+    "thumbnail": "/images/Logo.png",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Index.en"
+    }
   },
   {
-    "title": "Paths \u0026 addresses \u2014 complete guide",
-    "path": "Guide/Paths",
-    "shortDescription": "config.json paths, BaseDir, post URLs, images, relative vs absolute \u2014 everything in one place.",
+    "id": "00002",
+    "slug": "introduction",
+    "title": "What is BoneLog?",
+    "shortDescription": "File-based Blazor WASM blog \u2014 how it works.",
     "category": "Guide",
     "tags": [
       "BoneLog",
-      "documentation",
-      "paths"
+      "documentation"
     ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Introduction.en"
+    }
   },
   {
-    "title": "Publishing, releases \u0026 static hosting",
-    "path": "Guide/Publishing",
-    "shortDescription": "Manual deploy, version tags, and hosting BoneLog on GitHub Pages or elsewhere.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation",
-      "deploy"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "Quick start on GitHub Pages",
-    "path": "Guide/Quick-Start",
-    "shortDescription": "Fork, configure, enable Pages, and deploy BoneLog in a few steps.",
+    "id": "00003",
+    "slug": "quick-start",
+    "title": "Quick start",
+    "shortDescription": "Fork, configure, and publish on GitHub Pages.",
     "category": "Guide",
     "tags": [
       "BoneLog",
       "documentation",
       "github-pages"
     ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "Search \u0026 filters",
-    "path": "Guide/Search-and-Filter",
-    "shortDescription": "Home page search syntax \u2014 free text, Tag:, Cat:, and Lang: filters.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation"
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
     ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
+    "filePaths": {
+      "en": "Guide/Quick-Start.en"
+    }
   },
   {
-    "title": "Styles \u0026 customization",
-    "path": "Guide/Styles",
-    "shortDescription": "Themes, app.css, Prism, dark mode, and RTL markdown.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation",
-      "css"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "Tags, categories \u0026 language",
-    "path": "Guide/Tags-Categories-Language",
-    "shortDescription": "Organize posts with folders, tags, language codes, and sidebar toggles.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
-    "title": "GitHub Actions workflows",
-    "path": "Guide/Workflows",
-    "shortDescription": "CI, index generation, manual deploy, and tag releases.",
-    "category": "Guide",
-    "tags": [
-      "BoneLog",
-      "documentation",
-      "ci"
-    ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
-  },
-  {
+    "id": "00004",
+    "slug": "writing-posts",
     "title": "Writing posts",
-    "path": "Guide/Writing-Posts",
-    "shortDescription": "Front matter, Markdown features, Mermaid diagrams, and post URLs.",
+    "shortDescription": "Front matter, language files, links, and Markdown.",
     "category": "Guide",
     "tags": [
       "BoneLog",
       "documentation",
       "markdown"
     ],
-    "date": "2026-05-27T00:00:00+00:00",
-    "language": "EN"
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Writing-Posts.en"
+    }
+  },
+  {
+    "id": "00005",
+    "slug": "tags-categories-language",
+    "title": "Tags, categories \u0026 language",
+    "shortDescription": "Post identity, categories, tags, and multilingual files.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "i18n"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Tags-Categories-Language.en"
+    }
+  },
+  {
+    "id": "00006",
+    "slug": "search-and-filter",
+    "title": "Search \u0026 filters",
+    "shortDescription": "Home page search syntax and language filter.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Search-and-Filter.en"
+    }
+  },
+  {
+    "id": "00007",
+    "slug": "paths",
+    "title": "Paths \u0026 URLs",
+    "shortDescription": "BaseDir, post URLs, nav links, images, and data paths.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Paths.en"
+    }
+  },
+  {
+    "id": "00008",
+    "slug": "images",
+    "title": "Images",
+    "shortDescription": "Image paths in posts and front matter.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Images.en"
+    }
+  },
+  {
+    "id": "00009",
+    "slug": "configuration",
+    "title": "Configuration",
+    "shortDescription": "config.json reference.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Configuration.en"
+    }
+  },
+  {
+    "id": "00010",
+    "slug": "custom-pages",
+    "title": "Custom pages \u0026 navigation",
+    "shortDescription": "Extra Markdown pages outside the post index.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Custom-Pages.en"
+    }
+  },
+  {
+    "id": "00011",
+    "slug": "publishing",
+    "title": "Publishing",
+    "shortDescription": "GitHub Pages and static hosting.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "deploy"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Publishing.en"
+    }
+  },
+  {
+    "id": "00012",
+    "slug": "full-custom-hosting",
+    "title": "Custom hosting",
+    "shortDescription": "Release zip, any host, optional separate data repo.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "hosting"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Full-Custom-Hosting.en"
+    }
+  },
+  {
+    "id": "00013",
+    "slug": "workflows",
+    "title": "GitHub Actions",
+    "shortDescription": "CI, index generation, and deploy workflows.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "ci"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Workflows.en"
+    }
+  },
+  {
+    "id": "00014",
+    "slug": "styles",
+    "title": "Styles",
+    "shortDescription": "Customize look and feel.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "css"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Styles.en"
+    }
+  },
+  {
+    "id": "00015",
+    "slug": "developer-overview",
+    "title": "Developer overview",
+    "shortDescription": "Architecture for contributors.",
+    "category": "Guide",
+    "tags": [
+      "BoneLog",
+      "documentation",
+      "developers"
+    ],
+    "date": "2026-06-27T00:00:00+00:00",
+    "languages": [
+      "en"
+    ],
+    "filePaths": {
+      "en": "Guide/Developer-Overview.en"
+    }
   }
 ]
