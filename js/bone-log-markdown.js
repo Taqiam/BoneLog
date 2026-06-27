@@ -33,28 +33,65 @@
         return lastSlash >= 0 ? normalized.substring(0, lastSlash) : "";
     }
 
-    function shouldKeepHref(href) {
+    function isAbsoluteWebUrl(href) {
         if (!href) {
-            return true;
+            return false;
         }
-        if (href.charAt(0) === "#") {
+        if (href.indexOf("//") === 0) {
             return true;
         }
         var lower = href.toLowerCase();
-        if (lower.indexOf("http://") === 0 || lower.indexOf("https://") === 0 || lower.indexOf("mailto:") === 0 || lower.indexOf("tel:") === 0 || lower.indexOf("//") === 0) {
-            return true;
-        }
-        if (href.charAt(0) === "/") {
-            return true;
-        }
-        if (lower.indexOf("post/") === 0) {
-            return true;
-        }
-        return false;
+        return lower.indexOf("http://") === 0
+            || lower.indexOf("https://") === 0
+            || lower.indexOf("mailto:") === 0
+            || lower.indexOf("tel:") === 0;
     }
 
-    function resolveContentHref(href, contentPath, contentKind, postsPrefix) {
-        if (shouldKeepHref(href)) {
+    function toAppRelativeHref(href) {
+        if (!href || href.charAt(0) === "#" || isAbsoluteWebUrl(href)) {
+            return href;
+        }
+        return href.replace(/^\/+/, "");
+    }
+
+    function stripLanguageSuffix(name) {
+        var lastDot = name.lastIndexOf(".");
+        if (lastDot > 0) {
+            var suffix = name.substring(lastDot + 1);
+            if (suffix.length === 2 && /^[a-zA-Z]+$/.test(suffix)) {
+                return name.substring(0, lastDot);
+            }
+        }
+        return name;
+    }
+
+    function normalizeLinkKey(path) {
+        var normalized = path.replace(/\\/g, "/").replace(/^\/+/, "");
+        if (normalized.length > 3 && normalized.substring(normalized.length - 3).toLowerCase() === ".md") {
+            normalized = normalized.substring(0, normalized.length - 3);
+        }
+        var segments = normalized.split("/");
+        var fileName = segments[segments.length - 1] || normalized;
+        return {
+            full: normalized,
+            base: stripLanguageSuffix(fileName),
+            fileName: fileName
+        };
+    }
+
+    function lookupPostUrl(postUrlMap, path) {
+        var keys = normalizeLinkKey(path);
+        return postUrlMap[keys.full]
+            || postUrlMap[keys.base]
+            || postUrlMap[keys.fileName]
+            || postUrlMap[stripLanguageSuffix(keys.fileName)];
+    }
+
+    function resolveContentHref(href, contentPath, contentKind, postsPrefix, postUrlMap) {
+        if (!href || href.charAt(0) === "#") {
+            return href;
+        }
+        if (isAbsoluteWebUrl(href)) {
             return href;
         }
 
@@ -69,6 +106,19 @@
             }
         }
 
+        path = toAppRelativeHref(path);
+
+        if (/^posts\//i.test(path)) {
+            return path + fragment;
+        }
+
+        if (postUrlMap) {
+            var mapped = lookupPostUrl(postUrlMap, path);
+            if (mapped) {
+                return mapped + fragment;
+            }
+        }
+
         var baseDir = contentKind === "post"
             ? getPostMarkdownDirectory(contentPath || "", postsPrefix)
             : getPageDirectory(contentPath || "");
@@ -79,27 +129,52 @@
             normalized = normalized.substring(0, normalized.length - 3);
         }
 
-        if (normalized === postsPrefix) {
-            return "post/" + fragment;
-        }
-        if (normalized.indexOf(postsPrefix + "/") === 0) {
-            return "post/" + normalized.substring(postsPrefix.length + 1) + fragment;
+        if (postUrlMap) {
+            var mappedFromData = lookupPostUrl(postUrlMap, normalized);
+            if (mappedFromData) {
+                return mappedFromData + fragment;
+            }
         }
 
-        return normalized + fragment;
+        return toAppRelativeHref(normalized) + fragment;
+    }
+
+    function parsePostUrlMap(container) {
+        var raw = container.getAttribute("data-post-url-map");
+        if (!raw) {
+            return null;
+        }
+        try {
+            return JSON.parse(raw);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function fixImages(container) {
+        container.querySelectorAll("img[src]").forEach(function (img) {
+            var src = img.getAttribute("src");
+            if (!src || src.indexOf("//") === 0 || isAbsoluteWebUrl(src)) {
+                return;
+            }
+            if (src.charAt(0) === "/") {
+                img.setAttribute("src", src.replace(/^\/+/, ""));
+            }
+        });
     }
 
     function fixLinks(container) {
         var contentPath = container.getAttribute("data-content-path") || "";
         var contentKind = container.getAttribute("data-content-kind") || "post";
         var postsPrefix = (container.getAttribute("data-posts-prefix") || "posts").replace(/^\/+|\/+$/g, "");
+        var postUrlMap = parsePostUrlMap(container);
 
         container.querySelectorAll("a[href]").forEach(function (anchor) {
             var href = anchor.getAttribute("href");
             if (!href) {
                 return;
             }
-            var resolved = resolveContentHref(href, contentPath, contentKind, postsPrefix);
+            var resolved = resolveContentHref(href, contentPath, contentKind, postsPrefix, postUrlMap);
             if (resolved !== href) {
                 anchor.setAttribute("href", resolved);
             }
@@ -134,7 +209,10 @@
             if (window.Prism) {
                 Prism.highlightAll();
             }
-            document.querySelectorAll(".markdown-content").forEach(fixLinks);
+            document.querySelectorAll(".markdown-content").forEach(function (container) {
+                fixImages(container);
+                fixLinks(container);
+            });
             await renderMermaid();
         }
     };

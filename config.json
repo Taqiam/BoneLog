@@ -11,7 +11,7 @@
   "NavItems": [
     {
       "Title": "Guide",
-      "Url": "post/Guide/Index"
+      "Url": "posts/en/00001/index"
     },
     {
       "Title": "About",
@@ -30,8 +30,6 @@
   ],
   "Features": {
     "CategorySidebar": true,
-    "LanguageSidebar": true,
-    "TagSidebar": true,
-    "EnableMultilanguage": true
+    "TagSidebar": true
   }
 }
